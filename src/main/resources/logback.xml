@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- CONSOLE：輸出到主控台 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- 输出流物件 預設 System.out 改為 System.err-->
+        <target>System.out</target>
+        <encoder>
+            <!-- 格式化输出 -->
+            <!-- 格式：%d 日期｜%thread 執行緒名｜%-5level 等級顯示前5個字元｜%logger{50} 最長50個字元（超出切割） -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 控制日志的输出情况：如，ALL 開啟全部日誌，OFF 取消全部日誌 -->
+    <root level="info">
+        <!-- 這裡只需要留下需要輸出的目的地標籤就好 -->
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

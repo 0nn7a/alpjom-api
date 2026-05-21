@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: alpjom-api
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/${DB_NAME}?serverTimezone=Asia/Taipei
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # 開發時印出 SQL，上線記得關掉
+
+
+jwt:
+  access-secret: ${JWT_ACCESS_SECRET}
+  refresh-secret: ${JWT_REFRESH_SECRET}
