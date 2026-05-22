@@ -28,10 +28,10 @@ public class JwtUtils {
         this.accessKey = Keys.hmacShaKeyFor(accessSecret.getBytes(StandardCharsets.UTF_8));
         this.refreshKey = Keys.hmacShaKeyFor(refreshSecret.getBytes(StandardCharsets.UTF_8));
         this.accessExpirationMs = Duration.ofHours(1).toMillis(); // 1hr
-        this.refreshExpirationMs = Duration.ofMinutes(1).toMillis(); // 1day
+        this.refreshExpirationMs = Duration.ofDays(1).toMillis(); // 1day
     }
 
-    // 產生 Token：存 id、username、email
+    // 產生 token：存 id、username、email
     public String generateToken(Map<String, Object> claims) {
         return Jwts.builder()
                 .claims(claims)
@@ -40,7 +40,7 @@ public class JwtUtils {
                 .compact();
     }
 
-    // 產生 RefreshToken：只存 id
+    // 產生 refresh token：只存 id
     public String generateRefreshToken(Long userId) {
         return Jwts.builder()
                 .claim("id", userId)
@@ -49,7 +49,7 @@ public class JwtUtils {
                 .compact();
     }
 
-    // 解析 Token
+    // 解析 token
     public Claims parseToken(String token) {
         return Jwts.parser()
                 .verifyWith(accessKey)
@@ -58,7 +58,7 @@ public class JwtUtils {
                 .getPayload();
     }
 
-    // 解析 RefreshToken
+    // 解析 refresh token
     public Claims parseRefreshToken(String token) {
         return Jwts.parser()
                 .verifyWith(refreshKey)
@@ -67,7 +67,17 @@ public class JwtUtils {
                 .getPayload();
     }
 
-    // 取得 RefreshToken 到期時間
+    // 取得 token 到期時間戳（ms）
+    public Long parseTokenTime(String token) {
+        return parseToken(token).getExpiration().getTime();
+    }
+
+    // 取得 refresh token 到期時間戳（ms）
+    public Long parseRefreshTokenTime(String token) {
+        return parseRefreshToken(token).getExpiration().getTime();
+    }
+
+    // 取得 refresh token 到期時間
     public LocalDateTime parseRefreshTokenExpiration(String token) {
         Date expiration = parseRefreshToken(token).getExpiration();
         return expiration.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();

@@ -1,6 +1,7 @@
 package com.ternura.controller;
 
 import com.ternura.model.dto.LoginRequest;
+import com.ternura.model.dto.LoginResponse;
 import com.ternura.model.dto.RegisterRequest;
 import com.ternura.model.common.Result;
 import com.ternura.service.UserService;
@@ -22,9 +23,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public Result<Map<String, String>> login(@RequestBody LoginRequest request){
-        Map<String, String> tokens = userService.login(request);
-        return Result.success(tokens);
+    public Result<LoginResponse> login(@RequestBody LoginRequest request){
+        LoginResponse response = userService.login(request);
+        return Result.success(response);
     }
 
     // Authorization: Bearer eyJhbGci...        ← Access Token

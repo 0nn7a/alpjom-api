@@ -5,9 +5,11 @@ import com.ternura.exception.BusinessException;
 import com.ternura.exception.ErrorCode;
 import com.ternura.mapper.UserMapper;
 import com.ternura.model.dto.LoginRequest;
+import com.ternura.model.dto.LoginResponse;
 import com.ternura.model.dto.RegisterRequest;
 import com.ternura.model.entity.RefreshToken;
 import com.ternura.model.entity.User;
+import com.ternura.model.vo.UserVO;
 import com.ternura.utils.JwtUtils;
 import com.ternura.utils.PasswordUtil;
 import io.jsonwebtoken.JwtException;
@@ -64,7 +66,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public Map<String, String> login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
         String email = request.getEmail();
         String password = request.getPassword();
 
@@ -100,11 +102,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         entity.setExpiredAt(expiredAt);
         refreshTokenService.save(entity);
 
-        // 回傳兩個 Token
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("token", token);
-        tokens.put("refreshToken", refreshToken);
-        return tokens;
+        // 回傳 User 非敏感資料 + 兩個 Token 資料
+        UserVO userVO = new UserVO(user.getId(), user.getUsername(), user.getEmail(), user.getAvatar());
+        LoginResponse response = new LoginResponse();
+        response.setUser(userVO);
+        response.setToken(token);
+        response.setRefreshToken(refreshToken);
+        response.setExpiredAt(jwtUtils.parseTokenTime(token));
+        response.setRefreshExpiredAt(jwtUtils.parseRefreshTokenTime(refreshToken));
+
+        return response;
     }
 
     @Override
