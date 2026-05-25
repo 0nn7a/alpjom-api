@@ -9,5 +9,5 @@ public interface RefreshTokenService extends IService<RefreshToken> {
     void deleteByToken(String token);
     void deleteByTokenAndUserId(String token, Long userId);
     void deleteExpiredTokensByUserId(Long userId);
-    void selectByToken(String token);
+    RefreshToken selectByToken(String token);
 }

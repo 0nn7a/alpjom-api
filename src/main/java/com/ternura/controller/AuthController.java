@@ -2,6 +2,7 @@ package com.ternura.controller;
 
 import com.ternura.model.dto.LoginRequest;
 import com.ternura.model.dto.LoginResponse;
+import com.ternura.model.dto.RefreshResponse;
 import com.ternura.model.dto.RegisterRequest;
 import com.ternura.model.common.Result;
 import com.ternura.service.UserService;
@@ -31,8 +32,16 @@ public class AuthController {
     // Authorization: Bearer eyJhbGci...        ← Access Token
     // X-Refresh-Token: eyJhbGci...             ← Refresh Token
     @PostMapping("/logout")
-    public Result<Void> logout(@RequestHeader("X-Refresh-Token") String refreshToken) {
-        userService.logout(refreshToken);
+    public Result<Void> logout(@RequestHeader(value = "X-Refresh-Token", required = false) String refreshToken) {
+        if (refreshToken != null && !refreshToken.isEmpty()) {
+            userService.logout(refreshToken);
+        }
         return Result.success();
+    }
+
+    @PostMapping("/refresh")
+    public Result<RefreshResponse> refresh(@RequestHeader("X-Refresh-Token") String refreshToken) {
+        RefreshResponse response = userService.refresh(refreshToken);
+        return Result.success(response);
     }
 }

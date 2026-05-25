@@ -1,5 +1,6 @@
 package com.ternura.utils;
 
+import com.ternura.model.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -12,6 +13,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 @Component // 需要從 application.yml 注入變數
@@ -38,6 +40,13 @@ public class JwtUtils {
                 .expiration(new Date(System.currentTimeMillis() + accessExpirationMs))
                 .signWith(accessKey)
                 .compact();
+    }
+    public String generateTokenFromUser(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", user.getId());
+        claims.put("username", user.getUsername());
+        claims.put("email", user.getEmail());
+        return generateToken(claims);
     }
 
     // 產生 refresh token：只存 id

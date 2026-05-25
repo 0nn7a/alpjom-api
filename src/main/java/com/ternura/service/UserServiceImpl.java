@@ -6,12 +6,14 @@ import com.ternura.exception.ErrorCode;
 import com.ternura.mapper.UserMapper;
 import com.ternura.model.dto.LoginRequest;
 import com.ternura.model.dto.LoginResponse;
+import com.ternura.model.dto.RefreshResponse;
 import com.ternura.model.dto.RegisterRequest;
 import com.ternura.model.entity.RefreshToken;
 import com.ternura.model.entity.User;
 import com.ternura.model.vo.UserVO;
 import com.ternura.utils.JwtUtils;
 import com.ternura.utils.PasswordUtil;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -83,12 +85,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         // 產生 Token
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("id", user.getId());
-        claims.put("username", user.getUsername());
-        claims.put("email", user.getEmail());
-
-        String token = jwtUtils.generateToken(claims);
+        String token = jwtUtils.generateTokenFromUser(user);
         String refreshToken = jwtUtils.generateRefreshToken(user.getId());
         LocalDateTime expiredAt = jwtUtils.parseRefreshTokenExpiration(refreshToken);
 
@@ -125,5 +122,34 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             // 所以這裏只嘗試刪除用戶傳遞來的 refresh token，不順便清除該用戶的過期資料
             refreshTokenService.deleteByToken(refreshToken);
         }
+    }
+
+    @Override
+    public RefreshResponse refresh(String refreshToken) {
+        // 驗證 refresh token 是否合法
+        Claims claims;
+        try {
+            claims = jwtUtils.parseRefreshToken(refreshToken);
+        } catch (JwtException e) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED, "Refresh Token 無效或已過期！");
+        }
+
+        // 確認 DB 裏是否還存在該筆 refresh token（= 是否登出）
+        RefreshToken entity = refreshTokenService.selectByToken(refreshToken);
+        if (entity == null) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED, "Refresh Token 不存在，請重新登入！");
+        }
+
+        // 產生新的 access token
+        Long userId = claims.get("id", Long.class);
+        User user = userMapper.selectById(userId);
+        String newToken = jwtUtils.generateTokenFromUser(user);
+
+        // 返回新的 token 及到期時間給前端
+        RefreshResponse response = new RefreshResponse();
+        response.setToken(newToken);
+        response.setExpiredAt(jwtUtils.parseTokenTime(newToken));
+
+        return response;
     }
 }
