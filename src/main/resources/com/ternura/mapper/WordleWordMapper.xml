@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 上述為 MyBatis 固定標頭資料，不需修改 -->
+
+<mapper namespace="com.ternura.mapper.WordleWordMapper">
+    <insert id="insertBatch">
+        INSERT IGNORE INTO wordle_word (word, length, is_answer_candidate) VALUES
+        <foreach collection="list" item="w" separator=",">
+            (#{w.word}, #{w.length}, #{isAnswerCandidate})
+        </foreach>
+    </insert>
+</mapper>

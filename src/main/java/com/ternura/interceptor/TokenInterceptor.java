@@ -36,8 +36,12 @@ public class TokenInterceptor implements HandlerInterceptor {
         String requestURI = req.getRequestURI();
         log.info("進入攔截器，當前請求路徑: {}", requestURI);
 
-        // 2. 若為登入請求則直接放行
-        // 註冊時已處理為不攔截登入、註冊、登出路徑 ⏳
+        // 2. 需要直接放行的情況
+        //      2-1. 註冊時已處理為不攔截登入、註冊、登出路徑 ⏳
+        //      2-2. HTTP 方法是 OPTIONS 預檢的話直接放行
+        if ("OPTIONS".equalsIgnoreCase(req.getMethod())) {
+            return true;
+        }
 
         // 3. 獲取請求頭中的 Token
         String token = req.getHeader("Authorization");
