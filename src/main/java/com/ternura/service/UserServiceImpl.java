@@ -34,10 +34,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         List<String> existed = new ArrayList<>();
 
         // 檢查 username、email 是否重複
-        if (userMapper.findByUsername(request.getUsername()) != null) {
+        if (userMapper.selectByUsername(request.getUsername()) != null) {
             existed.add("username");
         }
-        if (userMapper.findByEmail(request.getEmail()) != null) {
+        if (userMapper.selectByEmail(request.getEmail()) != null) {
             existed.add("email");
         }
         if (!existed.isEmpty()) {
@@ -71,7 +71,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String password = request.getPassword();
 
         // 檢查是否已註冊
-        User user = userMapper.findByEmail(email);
+        User user = userMapper.selectByEmail(email);
         if (user == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND, "此 Email 尚未註冊！");
         }

@@ -27,7 +27,7 @@ public class RefreshTokenServiceImpl extends ServiceImpl<RefreshTokenMapper, Ref
     }
 
     @Override
-    public void findByToken(String token) {
-        refreshTokenMapper.findByToken(token);
+    public void selectByToken(String token) {
+        refreshTokenMapper.selectByToken(token);
     }
 }

@@ -18,5 +18,5 @@ public interface RefreshTokenMapper extends BaseMapper<RefreshToken> {
     void deleteExpiredTokensByUserId(Long userId);
 
     @Select("SELECT * FROM refresh_token WHERE token = #{token}")
-    RefreshToken findByToken(String token);
+    RefreshToken selectByToken(String token);
 }

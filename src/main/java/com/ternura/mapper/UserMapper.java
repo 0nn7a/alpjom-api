@@ -12,8 +12,8 @@ public interface UserMapper extends BaseMapper<User> {
     // 就能使用 insert(), deleteByIds(), update(), selectByIds()... 等方法
 
     @Select("SELECT * FROM user WHERE username = #{username}")
-    User findByUsername(String username);
+    User selectByUsername(String username);
 
     @Select("SELECT * FROM user WHERE email = #{email}")
-    User findByEmail(String email);
+    User selectByEmail(String email);
 }
