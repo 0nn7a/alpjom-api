@@ -12,4 +12,7 @@ import java.time.LocalDate;
 public interface WordleGameRecordMapper extends BaseMapper<WordleGameRecord> {
     @Select("SELECT * FROM wordle_game_record WHERE user_id = #{userId} AND mode = #{mode} AND date = #{today}")
     WordleGameRecord selectTodayRecord(Long userId, WordleMode mode, LocalDate today);
+
+    @Select("SELECT * FROM wordle_game_record WHERE id = #{id} AND user_id = #{userId}")
+    WordleGameRecord selectByUserAndId(Long userId, Long id);
 }
