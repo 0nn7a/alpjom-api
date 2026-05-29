@@ -18,3 +18,8 @@ mybatis-plus:
 jwt:
   access-secret: ${JWT_ACCESS_SECRET}
   refresh-secret: ${JWT_REFRESH_SECRET}
+
+
+server:
+  port: 8080
+  address: 0.0.0.0
