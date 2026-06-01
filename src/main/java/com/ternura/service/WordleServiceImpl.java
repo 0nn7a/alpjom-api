@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,7 @@ public class WordleServiceImpl implements WordleService {
 
     @Override
     public WordleStartResponse start(Long userId, WordleStartRequest request) {
+        // DAILY 模式或為選擇時，預設困難度為 NORMAL
         if (request.getDifficulty() == null || request.getMode() == WordleMode.DAILY) {
             request.setDifficulty(WordleDifficulty.NORMAL);
         }
@@ -97,7 +99,7 @@ public class WordleServiceImpl implements WordleService {
         }
 
         // 先統一將用戶猜詞轉為跟 DB 一樣全小寫
-        request.setGuessWord(request.getGuessWord().toLowerCase());
+        request.setGuessWord(request.getGuessWord().trim().toLowerCase(Locale.ROOT));
 
         // 驗證 guess 是否為合法的 5 字母單詞（在 wordle_word 表中存在）
         WordleWord word = wordleWordMapper.selectByWord(request.getGuessWord());

@@ -6,6 +6,8 @@ import com.ternura.model.dto.RefreshResponse;
 import com.ternura.model.dto.RegisterRequest;
 import com.ternura.model.common.Result;
 import com.ternura.service.UserService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,13 +20,13 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public Result<Void> register(@RequestBody RegisterRequest request){
+    public Result<Void> register(@Valid @RequestBody RegisterRequest request){
         userService.register(request);
         return Result.success();
     }
 
     @PostMapping("/login")
-    public Result<LoginResponse> login(@RequestBody LoginRequest request){
+    public Result<LoginResponse> login(@Valid @RequestBody LoginRequest request){
         LoginResponse response = userService.login(request);
         return Result.success(response);
     }
@@ -32,15 +34,13 @@ public class AuthController {
     // Authorization: Bearer eyJhbGci...        ← Access Token
     // X-Refresh-Token: eyJhbGci...             ← Refresh Token
     @PostMapping("/logout")
-    public Result<Void> logout(@RequestHeader(value = "X-Refresh-Token", required = false) String refreshToken) {
-        if (refreshToken != null && !refreshToken.isEmpty()) {
-            userService.logout(refreshToken);
-        }
+    public Result<Void> logout(@RequestHeader("X-Refresh-Token") String refreshToken) {
+        userService.logout(refreshToken);
         return Result.success();
     }
 
     @PostMapping("/refresh")
-    public Result<RefreshResponse> refresh(@RequestHeader("X-Refresh-Token") String refreshToken) {
+    public Result<RefreshResponse> refresh(@RequestHeader("X-Refresh-Token") @NotBlank(message = "請攜帶 refresh token！") String refreshToken) {
         RefreshResponse response = userService.refresh(refreshToken);
         return Result.success(response);
     }

@@ -113,6 +113,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public void logout(String refreshToken) {
+        // 即使未攜帶 refresh token 也直接判定為登出成功
+        if (refreshToken == null || refreshToken.isEmpty()) return;
+
         try {
             Long userId = jwtUtils.parseRefreshToken(refreshToken).get("id", Long.class);
             refreshTokenService.deleteByTokenAndUserId(refreshToken, userId);
@@ -131,13 +134,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         try {
             claims = jwtUtils.parseRefreshToken(refreshToken);
         } catch (JwtException e) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED, "Refresh Token 無效或已過期！");
+            throw new BusinessException(ErrorCode.UNAUTHORIZED, "Refresh Token 無效！");
         }
 
         // 確認 DB 裏是否還存在該筆 refresh token（= 是否登出）
         RefreshToken entity = refreshTokenService.selectByToken(refreshToken);
         if (entity == null) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED, "Refresh Token 不存在，請重新登入！");
+            throw new BusinessException(ErrorCode.UNAUTHORIZED, "Refresh Token 已過期，請重新登入！");
         }
 
         // 產生新的 access token
