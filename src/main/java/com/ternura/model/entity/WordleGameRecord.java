@@ -21,6 +21,7 @@ public class WordleGameRecord {
     private WordleDifficulty difficulty;
     private Integer maxGuesses; // 0 == MAX
     private Boolean isWin; // 1/0 -> true/false, null -> ing
+    private String shareToken; // isWin != null
     private LocalDateTime createdAt;
     private LocalDateTime finishedAt;
     private LocalDate date; // 每日謎題的日期，練習模式為 null

@@ -2,12 +2,22 @@ package com.ternura.controller;
 
 import com.ternura.model.common.Result;
 import com.ternura.model.dto.*;
+import com.ternura.model.enums.WordleDifficulty;
+import com.ternura.model.enums.WordleMode;
+import com.ternura.model.vo.WordleOngoingVO;
 import com.ternura.service.WordleService;
 import com.ternura.utils.CurrentHolder;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+
+@Validated
 @RestController
 @RequestMapping("/wordle")
 @RequiredArgsConstructor
@@ -34,4 +44,25 @@ public class WordleController {
         WordleGameResponse response = wordleService.game(userId, gameId);
         return Result.success(response);
     }
+
+    @GetMapping("share/{shareToken}")
+    public Result<WordleShareResponse> share(@PathVariable String shareToken) {
+        WordleShareResponse response = wordleService.share(shareToken);
+        return Result.success(response);
+    }
+
+    @GetMapping("/before/daily")
+    public Result<Map<String, Object>> beforeDaily(@RequestParam(required = false) LocalDate date) {
+        Long userId = CurrentHolder.getCurrentId();
+        Map<String, Object> response = wordleService.beforeDaily(userId, date);
+        return Result.success(response);
+    }
+
+    @GetMapping("/before/practice")
+    public Result<List<WordleOngoingVO>> beforePractice(@RequestParam @NotNull(message = "請選擇難易度！") WordleDifficulty difficulty) {
+        Long userId = CurrentHolder.getCurrentId();
+        List<WordleOngoingVO> games = wordleService.getOngoingGames(userId, WordleMode.PRACTICE, difficulty, null);
+        return Result.success(games);
+    }
+
 }

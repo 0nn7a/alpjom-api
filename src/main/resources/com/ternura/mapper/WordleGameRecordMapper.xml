@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 上述為 MyBatis 固定標頭資料，不需修改 -->
+
+<mapper namespace="com.ternura.mapper.WordleGameRecordMapper">
+    <select id="selectByCondition" resultType="com.ternura.model.entity.WordleGameRecord">
+        SELECT * FROM wordle_game_record
+        WHERE user_id = #{userId}
+        <if test="mode != null">
+            AND mode = #{mode}
+        </if>
+        <if test="difficulty != null">
+            AND difficulty = #{difficulty}
+        </if>
+        <if test="isWin != null and isWin == @com.ternura.model.enums.WordleIsWin@ONGOING">
+            AND is_win IS NULL
+        </if>
+        <if test="isWin != null and isWin == @com.ternura.model.enums.WordleIsWin@WIN">
+            AND is_win = true
+        </if>
+        <if test="isWin != null and isWin == @com.ternura.model.enums.WordleIsWin@LOSE">
+            AND is_win = false
+        </if>
+        <if test="date != null">
+            AND date = #{date}
+        </if>
+        ORDER BY created_at
+    </select>
+</mapper>

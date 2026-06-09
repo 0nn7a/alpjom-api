@@ -9,5 +9,5 @@ import java.time.LocalDate;
 @Mapper
 public interface WordleDailyAnswerMapper extends BaseMapper<WordleDailyAnswer> {
     @Select("SELECT * FROM wordle_daily_answer WHERE date = #{today}")
-    WordleDailyAnswer selectTodayAnswer(LocalDate today);
+    WordleDailyAnswer selectAnswerByDate(LocalDate today);
 }

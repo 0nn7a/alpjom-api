@@ -2,24 +2,23 @@ package com.ternura.service;
 
 import com.ternura.exception.BusinessException;
 import com.ternura.exception.ErrorCode;
+import com.ternura.mapper.UserMapper;
 import com.ternura.mapper.WordleGameGuessMapper;
 import com.ternura.mapper.WordleGameRecordMapper;
 import com.ternura.mapper.WordleWordMapper;
 import com.ternura.model.dto.*;
-import com.ternura.model.entity.WordleDailyAnswer;
-import com.ternura.model.entity.WordleGameGuess;
-import com.ternura.model.entity.WordleGameRecord;
-import com.ternura.model.entity.WordleWord;
+import com.ternura.model.entity.*;
 import com.ternura.model.enums.WordleDifficulty;
+import com.ternura.model.enums.WordleIsWin;
 import com.ternura.model.enums.WordleMode;
 import com.ternura.model.vo.WordleGameGuessVO;
+import com.ternura.model.vo.WordleOngoingVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +27,7 @@ public class WordleServiceImpl implements WordleService {
     private final WordleGameGuessMapper wordleGameGuessMapper;
     private final WordleGameRecordMapper wordleGameRecordMapper;
     private final WordleDailyAnswerService wordleDailyAnswerService;
+    private final UserMapper userMapper;
 
     @Override
     public WordleStartResponse start(Long userId, WordleStartRequest request) {
@@ -52,12 +52,14 @@ public class WordleServiceImpl implements WordleService {
 
         // DAILY 模式
         if (request.getMode() == WordleMode.DAILY) {
-            LocalDate today = LocalDate.now(ZoneOffset.UTC); // 設定成 UTC 時區統一的今天
+            if (request.getDate() != null) {
+                request.setDate(LocalDate.now(ZoneOffset.UTC)); // 預設成 UTC 時區統一的今天
+            }
 
             // 每個用戶只能玩一局
-            WordleGameRecord existed = wordleGameRecordMapper.selectTodayRecord(userId, WordleMode.DAILY, today);
+            WordleGameRecord existed = wordleGameRecordMapper.selectRecordByUserModeDate(userId, WordleMode.DAILY, request.getDate());
 
-            // 用戶已開始過今日謎題，直接包成 WordleStartResponse 回傳
+            // 用戶已開始過當日謎題，直接包成 WordleStartResponse 回傳
             if (existed != null) {
                 WordleStartResponse response = new WordleStartResponse();
                 response.setGameId(existed.getId());
@@ -65,11 +67,13 @@ public class WordleServiceImpl implements WordleService {
                 return response;
             }
 
-            // 新建立或取得今日謎題
-            WordleDailyAnswer answer = wordleDailyAnswerService.selectTodayAnswer();
+            // 新建立或取得當日謎題
+            WordleDailyAnswer answer = wordleDailyAnswerService.selectAnswerByDate(request.getDate());
             record.setWordId(answer.getWordId());
-            record.setDate(today);
-        } else if (request.getMode() == WordleMode.PRACTICE) {
+            record.setDate(request.getDate());
+        }
+        // PRACTICE 模式
+        else if (request.getMode() == WordleMode.PRACTICE) {
             // 從單詞庫隨機選一個答案
             WordleWord word = wordleWordMapper.selectAnswerByRandom();
             record.setWordId(word.getId());
@@ -88,7 +92,7 @@ public class WordleServiceImpl implements WordleService {
     @Override
     public WordleGuessResponse guess(Long userId, WordleGuessRequest request) {
         // 驗證遊戲是否存在且屬於該用戶
-        WordleGameRecord record = wordleGameRecordMapper.selectByUserAndId(userId, request.getGameId());
+        WordleGameRecord record = wordleGameRecordMapper.selectByIdUser(userId, request.getGameId());
         if (record == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND, "未找到符合遊戲！");
         }
@@ -137,17 +141,23 @@ public class WordleServiceImpl implements WordleService {
 
         if (isWin != null) {
             record.setIsWin(isWin);
+            record.setShareToken(UUID.randomUUID().toString());
             record.setFinishedAt(LocalDateTime.now());
             wordleGameRecordMapper.updateById(record);
         }
 
         // 回傳結果
+        WordleGameGuessVO guess = new WordleGameGuessVO();
+        guess.setGuessWord(request.getGuessWord());
+        guess.setResult(result);
+
         WordleGuessResponse response = new WordleGuessResponse();
-        response.setResult(result);
+        response.setGuess(guess);
         response.setIsWin(isWin);
 
         if (isWin != null) {
             response.setAnswer(answer.getWord());
+            response.setShareToken(record.getShareToken());
         }
 
         return response;
@@ -185,7 +195,7 @@ public class WordleServiceImpl implements WordleService {
     @Override
     public WordleGameResponse game(Long userId, Long gameId) {
         // 驗證遊戲是否存在且屬於該用戶
-        WordleGameRecord record = wordleGameRecordMapper.selectByUserAndId(userId, gameId);
+        WordleGameRecord record = wordleGameRecordMapper.selectByIdUser(userId, gameId);
         if (record == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND, "未找到符合遊戲！");
         }
@@ -197,15 +207,88 @@ public class WordleServiceImpl implements WordleService {
         response.setMaxGuesses(record.getMaxGuesses());
         response.setIsWin(record.getIsWin());
 
-        // 補齊 answer 及 guesses
+        // 補齊 answer、shareToken 及 guesses
         if (record.getIsWin() != null) {
             WordleWord word = wordleWordMapper.selectById(record.getWordId());
             response.setAnswer(word.getWord());
+            response.setShareToken(record.getShareToken());
         }
 
         List<WordleGameGuessVO> guesses = wordleGameGuessMapper.selectGuessesByGameId(record.getId());
         response.setGuesses(guesses);
 
         return response;
+    }
+
+    @Override
+    public WordleShareResponse share(String shareToken) {
+        // 根據 shareToken 查找遊戲資料
+        WordleGameRecord record = wordleGameRecordMapper.selectByShareToken(shareToken);
+        if (record == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND, "未找到符合遊戲！");
+        }
+
+        // 查詢該局遊戲的用戶資料
+        User user = userMapper.selectById(record.getUserId());
+
+        // 查詢猜測過程
+        List<WordleGameGuessVO> guesses = wordleGameGuessMapper.selectGuessesByGameId(record.getId());
+
+        // 組裝、補齊回應內容
+        WordleShareResponse response = new WordleShareResponse();
+        response.setUsername(user.getUsername());
+        response.setAvatar(user.getAvatar());
+        response.setMode(record.getMode());
+        response.setDifficulty(record.getDifficulty());
+        response.setMaxGuesses(record.getMaxGuesses());
+        response.setIsWin(record.getIsWin());
+        response.setGuesses(guesses);
+
+        return response;
+    }
+
+    @Override
+    public Map<String, Object> beforeDaily(Long userId, LocalDate date) {
+        // 取得該用戶當日是否開始過謎題
+        if (date == null) {
+            date = LocalDate.now(ZoneOffset.UTC);
+        }
+        WordleGameRecord existed = wordleGameRecordMapper.selectRecordByUserModeDate(userId, WordleMode.DAILY, date);
+
+        // 回傳 gameId、isWin 供前端判斷能否接續遊戲
+        Map<String, Object> result = new HashMap<>();
+
+        if (existed != null) {
+            result.put("gameId", existed.getId());
+            result.put("isWin", existed.getIsWin());
+            result.put("shareToken", existed.getShareToken());
+        } else {
+            result.put("gameId", null);
+            result.put("isWin", null);
+            result.put("shareToken", null);
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<WordleOngoingVO> getOngoingGames(Long userId, WordleMode mode, WordleDifficulty difficulty, LocalDate date) {
+        // 取得符合條件的未完成對局
+        List<WordleGameRecord> records = wordleGameRecordMapper.selectByCondition(userId, mode, difficulty, WordleIsWin.ONGOING, date);
+
+        // 封裝上每場對局的已猜測次數並回傳
+        return records.stream().map(record -> {
+            WordleOngoingVO ongoing = new WordleOngoingVO();
+            ongoing.setGameId(record.getId());
+            ongoing.setMode(record.getMode());
+            ongoing.setDifficulty(record.getDifficulty());
+            ongoing.setMaxGuesses(record.getMaxGuesses());
+            ongoing.setCreatedAt(record.getCreatedAt());
+
+            int guessCount = wordleGameGuessMapper.countGuessesByGameId(record.getId());
+            ongoing.setCurrentGuesses(guessCount);
+
+            return ongoing;
+        }).toList();
     }
 }

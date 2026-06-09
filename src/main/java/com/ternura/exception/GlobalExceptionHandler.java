@@ -11,6 +11,7 @@ import org.springframework.validation.method.ParameterErrors;
 import org.springframework.validation.method.ParameterValidationResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
@@ -202,6 +203,14 @@ public class GlobalExceptionHandler {
         }
 
         Result result = Result.error(code, "請求 Header 缺少必要欄位：" + headerName);
+        return ResponseEntity.status(result.getCode()).body(result);
+    }
+
+    // RequestParam 沒傳或序列化轉換結果為 null
+    @ExceptionHandler
+    public ResponseEntity<Result> handleMissingParamException(MissingServletRequestParameterException e) {
+        log.error(e.getMessage(), e);
+        Result result = Result.error(ErrorCode.INVALID_INPUT, "缺少必要 Param 參數：" + e.getParameterName());
         return ResponseEntity.status(result.getCode()).body(result);
     }
 
