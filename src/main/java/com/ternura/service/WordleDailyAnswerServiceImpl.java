@@ -5,11 +5,10 @@ import com.ternura.mapper.WordleDailyAnswerMapper;
 import com.ternura.mapper.WordleWordMapper;
 import com.ternura.model.entity.WordleDailyAnswer;
 import com.ternura.model.entity.WordleWord;
+import com.ternura.utils.TimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +23,7 @@ public class WordleDailyAnswerServiceImpl
     @Override
     public synchronized WordleDailyAnswer selectAnswerByDate(LocalDate date) {
         if (date == null) {
-            date = LocalDate.now(ZoneOffset.UTC);
+            date = TimeUtils.today();
         }
 
         // 檢查當日謎題是否已建立

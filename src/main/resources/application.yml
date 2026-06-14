@@ -1,6 +1,8 @@
 spring:
   application:
     name: alpjom-api
+  jackson:
+    time-zone: Asia/Taipei
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/${DB_NAME}?serverTimezone=Asia/Taipei

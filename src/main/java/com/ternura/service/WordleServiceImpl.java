@@ -13,11 +13,10 @@ import com.ternura.model.enums.WordleIsWin;
 import com.ternura.model.enums.WordleMode;
 import com.ternura.model.vo.WordleGameGuessVO;
 import com.ternura.model.vo.WordleOngoingVO;
+import com.ternura.utils.TimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.*;
 
 @Service
@@ -36,6 +35,11 @@ public class WordleServiceImpl implements WordleService {
             request.setDifficulty(WordleDifficulty.NORMAL);
         }
 
+        // 遊玩日預設為 UTC 時區統一的今天
+        if (request.getDate() != null) {
+            request.setDate(TimeUtils.today());
+        }
+
         // 根據 difficulty 決定 maxGuesses
         int maxGuesses = switch (request.getDifficulty()) {
             case EASY -> 0;
@@ -49,13 +53,10 @@ public class WordleServiceImpl implements WordleService {
         record.setMode(request.getMode());
         record.setDifficulty(request.getDifficulty());
         record.setMaxGuesses(maxGuesses);
+        record.setDate(request.getDate());
 
         // DAILY 模式
         if (request.getMode() == WordleMode.DAILY) {
-            if (request.getDate() != null) {
-                request.setDate(LocalDate.now(ZoneOffset.UTC)); // 預設成 UTC 時區統一的今天
-            }
-
             // 每個用戶只能玩一局
             WordleGameRecord existed = wordleGameRecordMapper.selectRecordByUserModeDate(userId, WordleMode.DAILY, request.getDate());
 
@@ -70,7 +71,6 @@ public class WordleServiceImpl implements WordleService {
             // 新建立或取得當日謎題
             WordleDailyAnswer answer = wordleDailyAnswerService.selectAnswerByDate(request.getDate());
             record.setWordId(answer.getWordId());
-            record.setDate(request.getDate());
         }
         // PRACTICE 模式
         else if (request.getMode() == WordleMode.PRACTICE) {
@@ -142,7 +142,7 @@ public class WordleServiceImpl implements WordleService {
         if (isWin != null) {
             record.setIsWin(isWin);
             record.setShareToken(UUID.randomUUID().toString());
-            record.setFinishedAt(LocalDateTime.now());
+            record.setFinishedAt(TimeUtils.now());
             wordleGameRecordMapper.updateById(record);
         }
 
@@ -251,7 +251,7 @@ public class WordleServiceImpl implements WordleService {
     public Map<String, Object> beforeDaily(Long userId, LocalDate date) {
         // 取得該用戶當日是否開始過謎題
         if (date == null) {
-            date = LocalDate.now(ZoneOffset.UTC);
+            date = TimeUtils.today();
         }
         WordleGameRecord existed = wordleGameRecordMapper.selectRecordByUserModeDate(userId, WordleMode.DAILY, date);
 

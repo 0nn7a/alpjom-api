@@ -89,6 +89,6 @@ public class JwtUtils {
     // 取得 refresh token 到期時間
     public LocalDateTime parseRefreshTokenExpiration(String token) {
         Date expiration = parseRefreshToken(token).getExpiration();
-        return expiration.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        return expiration.toInstant().atZone(TimeUtils.ZONE).toLocalDateTime();
     }
 }
