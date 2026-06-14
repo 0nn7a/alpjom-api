@@ -26,4 +26,12 @@
         </if>
         ORDER BY created_at
     </select>
+
+    <select id="selectHeatmapByUser" resultType="com.ternura.model.vo.HeatmapVO">
+        SELECT DATE(created_at) date, COUNT(1) count
+        FROM wordle_game_record
+        WHERE user_id = #{userId} AND is_win IS NOT NULL
+        GROUP BY DATE(created_at)
+        ORDER BY date
+    </select>
 </mapper>
