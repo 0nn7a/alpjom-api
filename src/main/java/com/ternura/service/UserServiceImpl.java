@@ -3,11 +3,9 @@ package com.ternura.service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ternura.exception.BusinessException;
 import com.ternura.exception.ErrorCode;
+import com.ternura.mapper.UserAvatarMapper;
 import com.ternura.mapper.UserMapper;
-import com.ternura.model.dto.LoginRequest;
-import com.ternura.model.dto.LoginResponse;
-import com.ternura.model.dto.RefreshResponse;
-import com.ternura.model.dto.RegisterRequest;
+import com.ternura.model.dto.*;
 import com.ternura.model.entity.RefreshToken;
 import com.ternura.model.entity.User;
 import com.ternura.model.vo.UserVO;
@@ -30,6 +28,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private final UserMapper userMapper;
     private final JwtUtils jwtUtils;
     private final RefreshTokenService refreshTokenService;
+    private final UserAvatarMapper userAvatarMapper;
 
     @Override
     public void register(RegisterRequest request) {

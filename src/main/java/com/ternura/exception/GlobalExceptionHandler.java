@@ -15,6 +15,8 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import tools.jackson.databind.exc.InvalidFormatException;
 import tools.jackson.databind.exc.MismatchedInputException;
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -211,6 +213,22 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Result> handleMissingParamException(MissingServletRequestParameterException e) {
         log.error(e.getMessage(), e);
         Result result = Result.error(ErrorCode.INVALID_INPUT, "缺少必要 Param 參數：" + e.getParameterName());
+        return ResponseEntity.status(result.getCode()).body(result);
+    }
+
+    // multipart 缺少必要參數
+    @ExceptionHandler
+    public ResponseEntity<Result> handleMissingPartException(MissingServletRequestPartException e) {
+        log.error("缺少上傳檔案: {}", e.getRequestPartName());
+        Result result = Result.error(ErrorCode.INVALID_INPUT, "缺少上傳檔案：" + e.getRequestPartName());
+        return ResponseEntity.status(result.getCode()).body(result);
+    }
+
+    // 檔案大小超過限制
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Result> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
+        log.error(e.getMessage(), e);
+        Result result = Result.error(ErrorCode.INVALID_INPUT, "上傳檔案大小超過限制！");
         return ResponseEntity.status(result.getCode()).body(result);
     }
 

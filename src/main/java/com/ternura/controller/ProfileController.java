@@ -1,13 +1,18 @@
 package com.ternura.controller;
 
 import com.ternura.model.common.Result;
+import com.ternura.model.dto.AvatarDeleteRequest;
+import com.ternura.model.dto.ProfileRequest;
 import com.ternura.model.dto.ProfileResponse;
+import com.ternura.model.entity.UserAvatar;
 import com.ternura.service.ProfileService;
+import com.ternura.utils.CurrentHolder;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.util.List;
 
 @RestController
 @RequestMapping("/profile")
@@ -15,9 +20,37 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProfileController {
     private final ProfileService profileService;
 
-    @GetMapping("/{username}")
-    public Result<ProfileResponse> getProfile(@PathVariable String username){
+    @GetMapping
+    public Result<ProfileResponse> getProfile(@RequestParam @NotBlank(message = "用戶名不得為空！") String username){
         ProfileResponse response = profileService.getProfile(username);
         return Result.success(response);
+    }
+
+    @PatchMapping("/update")
+    public Result<Void> updateProfile(@RequestBody ProfileRequest request) {
+        Long userId = CurrentHolder.getCurrentId();
+        profileService.updateProfile(userId, request);
+        return Result.success();
+    }
+
+    @GetMapping("/avatar")
+    public Result<List<UserAvatar>> getAvatar() {
+        Long userId = CurrentHolder.getCurrentId();
+        List<UserAvatar> response = profileService.getAvatar(userId);
+        return Result.success(response);
+    }
+
+    @PostMapping("/avatar")
+    public Result<UserAvatar> uploadAvatar(@RequestParam MultipartFile file){
+        Long userId = CurrentHolder.getCurrentId();
+        UserAvatar response = profileService.uploadAvatar(userId, file);
+        return Result.success(response);
+    }
+
+    @DeleteMapping("/avatar")
+    public Result<Void> deleteAvatar(@RequestBody @Valid AvatarDeleteRequest request){
+        Long userId = CurrentHolder.getCurrentId();
+        profileService.deleteAvatar(userId, request);
+        return Result.success();
     }
 }

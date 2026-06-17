@@ -1,0 +1,9 @@
+package com.ternura.model.dto;
+
+import lombok.Data;
+
+@Data
+public class ProfileRequest {
+    private String username;
+    private Long avatarId;
+}

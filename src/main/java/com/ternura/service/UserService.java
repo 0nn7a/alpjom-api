@@ -1,9 +1,6 @@
 package com.ternura.service;
 
-import com.ternura.model.dto.LoginRequest;
-import com.ternura.model.dto.LoginResponse;
-import com.ternura.model.dto.RefreshResponse;
-import com.ternura.model.dto.RegisterRequest;
+import com.ternura.model.dto.*;
 
 public interface UserService {
     void register(RegisterRequest request);

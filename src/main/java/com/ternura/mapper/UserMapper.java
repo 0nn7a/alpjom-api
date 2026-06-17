@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ternura.model.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 
 @Mapper
@@ -16,4 +17,7 @@ public interface UserMapper extends BaseMapper<User> {
 
     @Select("SELECT * FROM user WHERE email = #{email}")
     User selectByEmail(String email);
+
+    @Update("UPDATE user SET avatar = DEFAULT(avatar) WHERE id = #{id}")
+    void resetAvatarToDefault(Long id);
 }

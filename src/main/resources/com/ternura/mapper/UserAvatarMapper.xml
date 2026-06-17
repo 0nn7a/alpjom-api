@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 上述為 MyBatis 固定標頭資料，不需修改 -->
+
+<mapper namespace="com.ternura.mapper.UserAvatarMapper">
+    <select id="selectByUserIds" resultType="com.ternura.model.entity.UserAvatar">
+        SELECT * FROM user_avatar
+        WHERE user_id = #{userId}
+        AND id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <delete id="deleteByUserIds">
+        DELETE FROM user_avatar
+        WHERE user_id = #{userId}
+        AND id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

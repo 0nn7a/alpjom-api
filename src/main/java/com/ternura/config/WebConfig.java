@@ -17,7 +17,7 @@ public class WebConfig implements WebMvcConfigurer {
         // 攔截器的執行順序會依照註冊的先後順序
         registry.addInterceptor(tokenInterceptor)
                 .addPathPatterns("/**")        // 攔截所有路徑
-                .excludePathPatterns("/auth/**", "/profile/**", "/wordle/share/**");
+                .excludePathPatterns("/auth/**", "/profile", "/wordle/share/**");
                 // 直接排除不需攔截的路徑
     }
 }
