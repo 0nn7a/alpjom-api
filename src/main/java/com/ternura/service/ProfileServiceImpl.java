@@ -7,7 +7,6 @@ import com.ternura.mapper.UserAvatarMapper;
 import com.ternura.mapper.UserMapper;
 import com.ternura.mapper.WordleGameRecordMapper;
 import com.ternura.model.dto.AvatarDeleteRequest;
-import com.ternura.model.dto.ProfileRequest;
 import com.ternura.model.dto.ProfileResponse;
 import com.ternura.model.entity.User;
 import com.ternura.model.entity.UserAvatar;
@@ -54,31 +53,6 @@ public class ProfileServiceImpl implements ProfileService {
         response.setHeatmap(heatmap);
 
         return response;
-    }
-
-    @Override
-    public void updateProfile(Long userId, ProfileRequest request) {
-        User user = userMapper.selectById(userId);
-
-        if (request.getUsername() != null && !request.getUsername().isBlank()) {
-            // 確認新的 username 未被使用
-            User existed = userMapper.selectByUsername(request.getUsername());
-            if (existed != null && !existed.getId().equals(user.getId())) {
-                throw new BusinessException(ErrorCode.DUPLICATE_KEY, "該 username 已被使用！");
-            }
-            user.setUsername(request.getUsername());
-        }
-
-        if (request.getAvatarId() != null) {
-            UserAvatar avatar = userAvatarMapper.selectByUserId(userId, request.getAvatarId());
-            if (avatar == null) {
-                throw new BusinessException(ErrorCode.NOT_FOUND, "未找到符合頭貼！");
-            }
-            user.setAvatar(avatar.getFileUrl());
-        }
-
-        user.setUpdatedAt(TimeUtils.now());
-        userMapper.updateById(user);
     }
 
     @Override

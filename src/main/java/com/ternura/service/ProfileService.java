@@ -9,8 +9,6 @@ import java.util.List;
 
 public interface ProfileService {
     ProfileResponse getProfile(String username);
-    void updateProfile(Long userId, ProfileRequest request);
-
     List<UserAvatar> getAvatar(Long userId);
     UserAvatar uploadAvatar(Long userId, MultipartFile file);
     void deleteAvatar(Long userId, AvatarDeleteRequest request);

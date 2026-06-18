@@ -2,10 +2,12 @@ package com.ternura.controller;
 
 import com.ternura.model.common.Result;
 import com.ternura.model.dto.AvatarDeleteRequest;
+import com.ternura.model.dto.PasswordRequest;
 import com.ternura.model.dto.ProfileRequest;
 import com.ternura.model.dto.ProfileResponse;
 import com.ternura.model.entity.UserAvatar;
 import com.ternura.service.ProfileService;
+import com.ternura.service.UserService;
 import com.ternura.utils.CurrentHolder;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -19,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProfileController {
     private final ProfileService profileService;
+    private final UserService userService;
 
     @GetMapping
     public Result<ProfileResponse> getProfile(@RequestParam @NotBlank(message = "用戶名不得為空！") String username){
@@ -26,10 +29,17 @@ public class ProfileController {
         return Result.success(response);
     }
 
-    @PatchMapping("/update")
-    public Result<Void> updateProfile(@RequestBody ProfileRequest request) {
+    @PatchMapping("/user")
+    public Result<Void> updateUser(@RequestBody ProfileRequest request) {
         Long userId = CurrentHolder.getCurrentId();
-        profileService.updateProfile(userId, request);
+        userService.updateUser(userId, request);
+        return Result.success();
+    }
+
+    @PatchMapping("/password")
+    public Result<Void> updatePassword(@RequestBody PasswordRequest request) {
+        Long userId = CurrentHolder.getCurrentId();
+        userService.updatePassword(userId, request);
         return Result.success();
     }
 

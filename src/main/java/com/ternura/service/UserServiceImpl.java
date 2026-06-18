@@ -8,9 +8,11 @@ import com.ternura.mapper.UserMapper;
 import com.ternura.model.dto.*;
 import com.ternura.model.entity.RefreshToken;
 import com.ternura.model.entity.User;
+import com.ternura.model.entity.UserAvatar;
 import com.ternura.model.vo.UserVO;
 import com.ternura.utils.JwtUtils;
 import com.ternura.utils.PasswordUtil;
+import com.ternura.utils.TimeUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
@@ -153,5 +155,54 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         response.setExpiredAt(jwtUtils.parseTokenTime(newToken));
 
         return response;
+    }
+
+    @Override
+    public void updateUser(Long userId, ProfileRequest request) {
+        User user = userMapper.selectById(userId);
+
+        if (request.getUsername() != null && !request.getUsername().isBlank()) {
+            // 確認新的 username 未被使用
+            User existed = userMapper.selectByUsername(request.getUsername());
+            if (existed != null && !existed.getId().equals(user.getId())) {
+                throw new BusinessException(ErrorCode.DUPLICATE_KEY, "該 username 已被使用！");
+            }
+            user.setUsername(request.getUsername());
+        }
+
+        if (request.getAvatarId() != null) {
+            UserAvatar avatar = userAvatarMapper.selectByUserId(userId, request.getAvatarId());
+            if (avatar == null) {
+                throw new BusinessException(ErrorCode.NOT_FOUND, "未找到符合頭貼！");
+            }
+            user.setAvatar(avatar.getFileUrl());
+        }
+
+        user.setUpdatedAt(TimeUtils.now());
+        userMapper.updateById(user);
+    }
+
+    @Override
+    public void updatePassword(Long userId, PasswordRequest request) {
+        User user = userMapper.selectById(userId);
+
+        // 驗證舊密碼
+        if (!PasswordUtil.verify(request.getPasswordOld(), user.getSalt(), user.getPassword())) {
+            throw new BusinessException(ErrorCode.BUSINESS_ERROR, "舊密碼錯誤！");
+        }
+
+        // 防止新舊密碼相同
+        if (PasswordUtil.verify(request.getPassword(), user.getSalt(), user.getPassword())) {
+            throw new BusinessException(ErrorCode.BUSINESS_ERROR, "新密碼不得與舊密碼相同！");
+        }
+
+        // 產生新的鹽值並重設密碼
+        String salt = PasswordUtil.generateSalt();
+        String hashedPassword = PasswordUtil.hashPassword(request.getPassword(), salt);
+        user.setSalt(salt);
+        user.setPassword(hashedPassword);
+        user.setUpdatedAt(TimeUtils.now());
+
+        userMapper.updateById(user);
     }
 }
