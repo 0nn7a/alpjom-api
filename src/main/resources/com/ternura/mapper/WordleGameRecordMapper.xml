@@ -28,10 +28,10 @@
     </select>
 
     <select id="selectHeatmapByUser" resultType="com.ternura.model.vo.HeatmapVO">
-        SELECT DATE(created_at) date, COUNT(1) count
+        SELECT DATE(date) date, COUNT(1) count
         FROM wordle_game_record
         WHERE user_id = #{userId} AND is_win IS NOT NULL
-        GROUP BY DATE(created_at)
+        GROUP BY DATE(date)
         ORDER BY date
     </select>
 </mapper>

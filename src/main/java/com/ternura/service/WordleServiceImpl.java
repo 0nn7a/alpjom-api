@@ -30,13 +30,13 @@ public class WordleServiceImpl implements WordleService {
 
     @Override
     public WordleStartResponse start(Long userId, WordleStartRequest request) {
-        // DAILY 模式或為選擇時，預設困難度為 NORMAL
+        // DAILY 模式或未選擇時，預設難易度為 NORMAL
         if (request.getDifficulty() == null || request.getMode() == WordleMode.DAILY) {
             request.setDifficulty(WordleDifficulty.NORMAL);
         }
 
-        // 遊玩日預設為 UTC 時區統一的今天
-        if (request.getDate() != null) {
+        // 遊玩日預設為 UTC 時區統一的今天（練習模式也固定為當日，不得擇日）
+        if (request.getDate() == null || request.getMode() == WordleMode.PRACTICE) {
             request.setDate(TimeUtils.today());
         }
 
