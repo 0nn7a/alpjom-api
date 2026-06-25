@@ -206,6 +206,7 @@ public class WordleServiceImpl implements WordleService {
         response.setDifficulty(record.getDifficulty());
         response.setMaxGuesses(record.getMaxGuesses());
         response.setIsWin(record.getIsWin());
+        response.setDate(record.getDate());
 
         // 補齊 answer、shareToken 及 guesses
         if (record.getIsWin() != null) {
