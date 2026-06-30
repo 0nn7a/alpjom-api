@@ -2,15 +2,13 @@ package com.ternura.service;
 
 import com.ternura.exception.BusinessException;
 import com.ternura.exception.ErrorCode;
-import com.ternura.mapper.UserMapper;
-import com.ternura.mapper.WordleGameGuessMapper;
-import com.ternura.mapper.WordleGameRecordMapper;
-import com.ternura.mapper.WordleWordMapper;
+import com.ternura.mapper.*;
 import com.ternura.model.dto.*;
 import com.ternura.model.entity.*;
 import com.ternura.model.enums.WordleDifficulty;
 import com.ternura.model.enums.WordleIsWin;
 import com.ternura.model.enums.WordleMode;
+import com.ternura.model.vo.WordleCommentVO;
 import com.ternura.model.vo.WordleGameGuessVO;
 import com.ternura.model.vo.WordleOngoingVO;
 import com.ternura.utils.TimeUtils;
@@ -22,11 +20,12 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class WordleServiceImpl implements WordleService {
+    private final UserMapper userMapper;
     private final WordleWordMapper wordleWordMapper;
     private final WordleGameGuessMapper wordleGameGuessMapper;
     private final WordleGameRecordMapper wordleGameRecordMapper;
     private final WordleDailyAnswerService wordleDailyAnswerService;
-    private final UserMapper userMapper;
+    private final WordleCommentService wordleCommentService;
 
     @Override
     public WordleStartResponse start(Long userId, WordleStartRequest request) {
@@ -244,6 +243,10 @@ public class WordleServiceImpl implements WordleService {
         response.setMaxGuesses(record.getMaxGuesses());
         response.setIsWin(record.getIsWin());
         response.setGuesses(guesses);
+
+        // 查找、補齊留言區
+        List<WordleCommentVO> comments = wordleCommentService.selectByGameId(record.getId());
+        response.setComments(comments);
 
         return response;
     }

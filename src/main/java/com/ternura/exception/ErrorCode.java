@@ -9,7 +9,8 @@ public enum ErrorCode {
     NOT_FOUND(404, "未找到符合資料！"),
     UNAUTHORIZED(401, "身份驗證失敗！"),
     BUSINESS_ERROR(400, "業務邏輯錯誤！"),
-    INVALID_INPUT(422, "輸入內容不合法！");
+    INVALID_INPUT(422, "輸入內容不合法！"),
+    FORBIDDEN(403, "權限不足！");
 
     private final int code;
     private final String message;

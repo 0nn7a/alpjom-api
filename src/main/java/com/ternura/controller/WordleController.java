@@ -5,6 +5,7 @@ import com.ternura.model.dto.*;
 import com.ternura.model.enums.WordleDifficulty;
 import com.ternura.model.enums.WordleMode;
 import com.ternura.model.vo.WordleOngoingVO;
+import com.ternura.service.WordleCommentService;
 import com.ternura.service.WordleService;
 import com.ternura.utils.CurrentHolder;
 import jakarta.validation.Valid;
@@ -23,6 +24,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class WordleController {
     private final WordleService wordleService;
+    private final WordleCommentService wordleCommentService;
 
     @PostMapping("/start")
     public Result<WordleStartResponse> start(@Valid @RequestBody WordleStartRequest request) {
@@ -45,10 +47,24 @@ public class WordleController {
         return Result.success(response);
     }
 
-    @GetMapping("share/{shareToken}")
+    @GetMapping("/share/{shareToken}")
     public Result<WordleShareResponse> share(@PathVariable String shareToken) {
         WordleShareResponse response = wordleService.share(shareToken);
         return Result.success(response);
+    }
+
+    @PostMapping("/comment")
+    public Result<Void> insertComment(@Valid @RequestBody WordleCommentRequest request) {
+        Long userId = CurrentHolder.getCurrentId();
+        wordleCommentService.insert(userId, request);
+        return Result.success();
+    }
+
+    @DeleteMapping("/comment/{id}")
+    public Result<Void> deleteComment(@PathVariable Long id) {
+        Long userId = CurrentHolder.getCurrentId();
+        wordleCommentService.delete(userId, id);
+        return Result.success();
     }
 
     @GetMapping("/before/daily")
