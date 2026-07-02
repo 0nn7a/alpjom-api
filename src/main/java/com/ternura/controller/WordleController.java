@@ -4,8 +4,10 @@ import com.ternura.model.common.Result;
 import com.ternura.model.dto.*;
 import com.ternura.model.enums.WordleDifficulty;
 import com.ternura.model.enums.WordleMode;
+import com.ternura.model.vo.WordleLikeVO;
 import com.ternura.model.vo.WordleOngoingVO;
 import com.ternura.service.WordleCommentService;
+import com.ternura.service.WordleLikeService;
 import com.ternura.service.WordleService;
 import com.ternura.utils.CurrentHolder;
 import jakarta.validation.Valid;
@@ -25,6 +27,7 @@ import java.util.Map;
 public class WordleController {
     private final WordleService wordleService;
     private final WordleCommentService wordleCommentService;
+    private final WordleLikeService wordleLikeService;
 
     @PostMapping("/start")
     public Result<WordleStartResponse> start(@Valid @RequestBody WordleStartRequest request) {
@@ -49,7 +52,15 @@ public class WordleController {
 
     @GetMapping("/share/{shareToken}")
     public Result<WordleShareResponse> share(@PathVariable String shareToken) {
-        WordleShareResponse response = wordleService.share(shareToken);
+        Long userId = CurrentHolder.getCurrentId();
+        WordleShareResponse response = wordleService.share(userId, shareToken);
+        return Result.success(response);
+    }
+
+    @PostMapping("/like/{shareToken}")
+    public Result<WordleLikeVO> like(@PathVariable String shareToken) {
+        Long userId = CurrentHolder.getCurrentId();
+        WordleLikeVO response = wordleLikeService.toggle(userId, shareToken);
         return Result.success(response);
     }
 

@@ -16,7 +16,7 @@ public interface WordleService{
 
     WordleGameResponse game(Long userId, Long gameId);
 
-    WordleShareResponse share(String shareToken);
+    WordleShareResponse share(Long userId, String shareToken);
 
     Map<String, Object> beforeDaily(Long userId, LocalDate date);
 

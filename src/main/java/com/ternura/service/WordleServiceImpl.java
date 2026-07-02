@@ -1,5 +1,6 @@
 package com.ternura.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ternura.exception.BusinessException;
 import com.ternura.exception.ErrorCode;
 import com.ternura.mapper.*;
@@ -10,6 +11,7 @@ import com.ternura.model.enums.WordleIsWin;
 import com.ternura.model.enums.WordleMode;
 import com.ternura.model.vo.WordleCommentVO;
 import com.ternura.model.vo.WordleGameGuessVO;
+import com.ternura.model.vo.WordleLikeVO;
 import com.ternura.model.vo.WordleOngoingVO;
 import com.ternura.utils.TimeUtils;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ public class WordleServiceImpl implements WordleService {
     private final WordleGameGuessMapper wordleGameGuessMapper;
     private final WordleGameRecordMapper wordleGameRecordMapper;
     private final WordleDailyAnswerService wordleDailyAnswerService;
+    private final WordleLikeService wordleLikeService;
     private final WordleCommentService wordleCommentService;
 
     @Override
@@ -221,7 +224,7 @@ public class WordleServiceImpl implements WordleService {
     }
 
     @Override
-    public WordleShareResponse share(String shareToken) {
+    public WordleShareResponse share(Long userId, String shareToken) {
         // 根據 shareToken 查找遊戲資料
         WordleGameRecord record = wordleGameRecordMapper.selectByShareToken(shareToken);
         if (record == null) {
@@ -243,6 +246,20 @@ public class WordleServiceImpl implements WordleService {
         response.setMaxGuesses(record.getMaxGuesses());
         response.setIsWin(record.getIsWin());
         response.setGuesses(guesses);
+
+        // 查找、補齊 like 資料
+        long likeCount = wordleLikeService.count(new LambdaQueryWrapper<WordleLike>()
+                .eq(WordleLike::getGameRecordId, record.getId()));
+        boolean likedByMe = false;
+        if (userId != null) {
+            likedByMe = wordleLikeService.getOne(new LambdaQueryWrapper<WordleLike>()
+                    .eq(WordleLike::getGameRecordId, record.getId())
+                    .eq(WordleLike::getUserId, userId)) != null;
+        }
+        WordleLikeVO wordleLike = new WordleLikeVO();
+        wordleLike.setCount(likeCount);
+        wordleLike.setByMe(likedByMe);
+        response.setLike(wordleLike);
 
         // 查找、補齊留言區
         List<WordleCommentVO> comments = wordleCommentService.selectByGameId(record.getId());

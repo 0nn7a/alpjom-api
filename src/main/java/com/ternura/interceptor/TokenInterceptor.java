@@ -14,12 +14,27 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import tools.jackson.databind.ObjectMapper;
 
+import java.util.List;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class TokenInterceptor implements HandlerInterceptor {
     private final JwtUtils jwtUtils;
     private final ObjectMapper objectMapper; // 用於整理並統一回應格式為自定義 Result 類
+
+    // 如果有帶 token 就解析，沒有就算了的請求路徑
+    private static final List<String> OPTIONAL_AUTH_PATHS = List.of("/wordle/share");
+    private boolean isOptionalAuthPath(HttpServletRequest req) {
+        String uri = req.getRequestURI();
+        // String method = req.getMethod();
+
+        if (uri.startsWith("/wordle/share")) return true;
+        // 之後有需要限制 method 的情況，可以這樣寫：
+        // if (uri.startsWith("/games/") && "GET".equalsIgnoreCase(method)) return true;
+
+        return false;
+    }
 
     private void writeErrorRes(HttpServletResponse res, int code, String message) throws Exception {
         res.setStatus(code);
@@ -48,6 +63,11 @@ public class TokenInterceptor implements HandlerInterceptor {
 
         // 4. 若 Token 不存在，回應 401 錯誤
         if (token == null || token.isEmpty()) {
+            // 4-1. 例外情況：可選 Token 之請求路徑
+            if (isOptionalAuthPath(req)) {
+                return true;
+            }
+
             log.info("令牌為空，回應 401");
             writeErrorRes(res, 401, "請先登入！");
             return false;
@@ -68,6 +88,12 @@ public class TokenInterceptor implements HandlerInterceptor {
             Long userId = claims.get("id", Long.class);
             CurrentHolder.setCurrentId(userId);
         } catch (Exception e) {
+            // 6-1. 同 4-1. 例外情況：可選 Token 之請求路徑
+            if (isOptionalAuthPath(req)) {
+                log.info("可選路徑，令牌無效但仍可放行：{}", requestURI);
+                return true;
+            }
+
             log.info("令牌不合法，回應 401");
             writeErrorRes(res, 401, "Token 無效或已過期！");
             return false;
