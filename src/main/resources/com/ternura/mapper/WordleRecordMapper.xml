@@ -2,9 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!-- 上述為 MyBatis 固定標頭資料，不需修改 -->
 
-<mapper namespace="com.ternura.mapper.WordleGameRecordMapper">
-    <select id="selectByCondition" resultType="com.ternura.model.entity.WordleGameRecord">
-        SELECT * FROM wordle_game_record
+<mapper namespace="com.ternura.mapper.WordleRecordMapper">
+    <select id="selectByCondition" resultType="com.ternura.model.entity.WordleRecord">
+        SELECT * FROM wordle_record
         WHERE user_id = #{userId}
         <if test="mode != null">
             AND mode = #{mode}
@@ -29,7 +29,7 @@
 
     <select id="selectHeatmapByUser" resultType="com.ternura.model.vo.HeatmapVO">
         SELECT DATE(date) date, COUNT(1) count
-        FROM wordle_game_record
+        FROM wordle_record
         WHERE user_id = #{userId} AND is_win IS NOT NULL
         GROUP BY DATE(date)
         ORDER BY date

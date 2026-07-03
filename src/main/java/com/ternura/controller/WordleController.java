@@ -43,10 +43,10 @@ public class WordleController {
         return Result.success(response);
     }
 
-    @GetMapping("/game/{gameId}")
-    public Result<WordleGameResponse> game(@PathVariable Long gameId) {
+    @GetMapping("/game/{recordId}")
+    public Result<WordleGameResponse> game(@PathVariable Long recordId) {
         Long userId = CurrentHolder.getCurrentId();
-        WordleGameResponse response = wordleService.game(userId, gameId);
+        WordleGameResponse response = wordleService.game(userId, recordId);
         return Result.success(response);
     }
 

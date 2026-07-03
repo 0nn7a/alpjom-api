@@ -14,7 +14,7 @@ public interface WordleService{
 
     WordleGuessResponse guess(Long userId, WordleGuessRequest request);
 
-    WordleGameResponse game(Long userId, Long gameId);
+    WordleGameResponse game(Long userId, Long recordId);
 
     WordleShareResponse share(Long userId, String shareToken);
 

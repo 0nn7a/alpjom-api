@@ -5,7 +5,7 @@ import com.ternura.exception.BusinessException;
 import com.ternura.exception.ErrorCode;
 import com.ternura.mapper.UserAvatarMapper;
 import com.ternura.mapper.UserMapper;
-import com.ternura.mapper.WordleGameRecordMapper;
+import com.ternura.mapper.WordleRecordMapper;
 import com.ternura.model.dto.AvatarDeleteRequest;
 import com.ternura.model.dto.ProfileResponse;
 import com.ternura.model.entity.User;
@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService {
     private final UserMapper userMapper;
-    private final WordleGameRecordMapper wordleGameRecordMapper;
+    private final WordleRecordMapper wordleRecordMapper;
     private final UserAvatarMapper userAvatarMapper;
     private final CloudService cloudService;
 
@@ -33,13 +33,13 @@ public class ProfileServiceImpl implements ProfileService {
         if (user == null) throw new BusinessException(ErrorCode.NOT_FOUND, "用戶不存在！");
 
         // 2. 今日謎題已完成徽章
-        boolean isDailyDone = wordleGameRecordMapper.isDailyDoneByUserDate(user.getId(), TimeUtils.today());
+        boolean isDailyDone = wordleRecordMapper.isDailyDoneByUserDate(user.getId(), TimeUtils.today());
 
         // 3. 所有已完成局數
-        int totalDone = wordleGameRecordMapper.countTotalDoneByUser(user.getId());
+        int totalDone = wordleRecordMapper.countTotalDoneByUser(user.getId());
 
         // 4. 打卡熱力圖
-        List<HeatmapVO> heatmap = wordleGameRecordMapper.selectHeatmapByUser(user.getId());
+        List<HeatmapVO> heatmap = wordleRecordMapper.selectHeatmapByUser(user.getId());
 
         // 組裝資料回傳
         ProfileResponse response = new ProfileResponse();

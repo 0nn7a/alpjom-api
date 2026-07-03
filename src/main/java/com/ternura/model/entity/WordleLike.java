@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class WordleLike {
     @TableId(type = IdType.AUTO)
     private Long id;
-    private Long gameRecordId;
+    private Long recordId;
     private Long userId;
     private LocalDateTime createdAt;
 }

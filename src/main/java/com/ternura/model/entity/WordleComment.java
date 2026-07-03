@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class WordleComment {
     @TableId(type = IdType.AUTO)
     private Long id;
-    private Long gameRecordId;
+    private Long recordId;
     private Long userId;
     private String content;
     private LocalDateTime createdAt;

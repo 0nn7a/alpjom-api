@@ -3,11 +3,11 @@
 <!-- 上述為 MyBatis 固定標頭資料，不需修改 -->
 
 <mapper namespace="com.ternura.mapper.WordleCommentMapper">
-    <select id="selectByGameId" resultType="com.ternura.model.vo.WordleCommentVO">
+    <select id="selectByRecordId" resultType="com.ternura.model.vo.WordleCommentVO">
         SELECT c.id, u.username, u.avatar, c.content, c.created_at
         FROM wordle_comment c
         JOIN user u ON c.user_id = u.id
-        WHERE c.game_record_id = #{gameId} AND c.is_deleted = 0
+        WHERE c.record_id = #{recordId} AND c.is_deleted = 0
         ORDER BY c.created_at DESC
     </select>
 </mapper>

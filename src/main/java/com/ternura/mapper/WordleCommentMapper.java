@@ -14,5 +14,5 @@ public interface WordleCommentMapper extends BaseMapper<WordleComment> {
     @Update("UPDATE wordle_comment SET is_deleted = 1, updated_at = #{updatedAt} WHERE id = #{id}")
     int softDeleteById(Long id, LocalDateTime updatedAt);
 
-    List<WordleCommentVO> selectByGameId(Long gameId);
+    List<WordleCommentVO> selectByRecordId(Long recordId);
 }

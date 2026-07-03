@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class WordleOngoingVO {
-    private Long gameId;
+    private Long recordId;
     private WordleMode mode;
     private WordleDifficulty difficulty;
     private Integer maxGuesses;

@@ -11,8 +11,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("wordle_game_record")
-public class WordleGameRecord {
+@TableName("wordle_record")
+public class WordleRecord {
     @TableId(type = IdType.AUTO)
     private Long id;
     private Long userId;

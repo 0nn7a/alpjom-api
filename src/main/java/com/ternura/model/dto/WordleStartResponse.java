@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class WordleStartResponse {
-    private Long gameId;
+    private Long recordId;
     private Integer maxGuesses;
 }

@@ -4,10 +4,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ternura.exception.BusinessException;
 import com.ternura.exception.ErrorCode;
 import com.ternura.mapper.WordleCommentMapper;
-import com.ternura.mapper.WordleGameRecordMapper;
+import com.ternura.mapper.WordleRecordMapper;
 import com.ternura.model.dto.WordleCommentRequest;
 import com.ternura.model.entity.WordleComment;
-import com.ternura.model.entity.WordleGameRecord;
+import com.ternura.model.entity.WordleRecord;
 import com.ternura.model.vo.WordleCommentVO;
 import com.ternura.utils.TimeUtils;
 import lombok.AllArgsConstructor;
@@ -19,19 +19,19 @@ import java.util.List;
 @AllArgsConstructor
 public class WordleCommentServiceImpl extends ServiceImpl<WordleCommentMapper, WordleComment> implements WordleCommentService {
     private final WordleCommentMapper wordleCommentMapper;
-    private final WordleGameRecordMapper wordleGameRecordMapper;
+    private final WordleRecordMapper wordleRecordMapper;
 
     @Override
     public void insert(Long userId, WordleCommentRequest request) {
         // 根據 shareToken 查找遊戲資料
-        WordleGameRecord record = wordleGameRecordMapper.selectByShareToken(request.getShareToken());
+        WordleRecord record = wordleRecordMapper.selectByShareToken(request.getShareToken());
         if (record == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND, "未找到符合遊戲！");
         }
 
         // 插入一筆新留言
         WordleComment comment = new WordleComment();
-        comment.setGameRecordId(record.getId());
+        comment.setRecordId(record.getId());
         comment.setUserId(userId);
         comment.setContent(request.getContent());
         comment.setCreatedAt(TimeUtils.now());
@@ -61,7 +61,7 @@ public class WordleCommentServiceImpl extends ServiceImpl<WordleCommentMapper, W
     }
 
     @Override
-    public List<WordleCommentVO> selectByGameId(Long gameId) {
-        return wordleCommentMapper.selectByGameId(gameId);
+    public List<WordleCommentVO> selectByRecordId(Long recordId) {
+        return wordleCommentMapper.selectByRecordId(recordId);
     }
 }

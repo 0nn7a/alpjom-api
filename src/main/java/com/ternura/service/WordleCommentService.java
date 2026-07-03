@@ -10,5 +10,5 @@ public interface WordleCommentService {
 
     void delete(Long userId, Long id);
 
-    List<WordleCommentVO> selectByGameId(Long gameId);
+    List<WordleCommentVO> selectByRecordId(Long recordId);
 }
