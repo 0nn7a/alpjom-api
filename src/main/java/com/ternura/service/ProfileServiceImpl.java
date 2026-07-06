@@ -8,6 +8,7 @@ import com.ternura.mapper.UserMapper;
 import com.ternura.mapper.WordleRecordMapper;
 import com.ternura.model.dto.AvatarDeleteRequest;
 import com.ternura.model.dto.ProfileResponse;
+import com.ternura.model.dto.UserFollowResponse;
 import com.ternura.model.entity.User;
 import com.ternura.model.entity.UserAvatar;
 import com.ternura.model.vo.HeatmapVO;
@@ -25,20 +26,24 @@ public class ProfileServiceImpl implements ProfileService {
     private final WordleRecordMapper wordleRecordMapper;
     private final UserAvatarMapper userAvatarMapper;
     private final CloudService cloudService;
+    private final UserFollowService userFollowService;
 
     @Override
-    public ProfileResponse getProfile(String username) {
-        // 1. 用戶基本資料
+    public ProfileResponse getProfile(Long userId, String username) {
+        // 用戶基本資料
         User user = userMapper.selectByUsername(username);
         if (user == null) throw new BusinessException(ErrorCode.NOT_FOUND, "用戶不存在！");
 
-        // 2. 今日謎題已完成徽章
+        // 今日謎題已完成徽章
         boolean isDailyDone = wordleRecordMapper.isDailyDoneByUserDate(user.getId(), TimeUtils.today());
 
-        // 3. 所有已完成局數
+        // 追蹤關係
+        UserFollowResponse follow = userFollowService.getFollow(user.getId(), userId);
+
+        // 所有已完成局數
         int totalDone = wordleRecordMapper.countTotalDoneByUser(user.getId());
 
-        // 4. 打卡熱力圖
+        // 打卡熱力圖
         List<HeatmapVO> heatmap = wordleRecordMapper.selectHeatmapByUser(user.getId());
 
         // 組裝資料回傳
@@ -47,6 +52,7 @@ public class ProfileServiceImpl implements ProfileService {
         response.setUsername(user.getUsername());
         response.setAvatar(user.getAvatar());
         response.setCreatedAt(user.getCreatedAt().toLocalDate());
+        response.setFollow(follow);
         response.setIsDailyDone(isDailyDone);
         response.setTotalDone(totalDone);
         response.setTotalAchievements(0); // 暫未開發，先回傳 0

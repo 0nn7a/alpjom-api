@@ -24,12 +24,12 @@ public class TokenInterceptor implements HandlerInterceptor {
     private final ObjectMapper objectMapper; // 用於整理並統一回應格式為自定義 Result 類
 
     // 如果有帶 token 就解析，沒有就算了的請求路徑
-    private static final List<String> OPTIONAL_AUTH_PATHS = List.of("/wordle/share");
     private boolean isOptionalAuthPath(HttpServletRequest req) {
         String uri = req.getRequestURI();
         // String method = req.getMethod();
 
         if (uri.startsWith("/wordle/share")) return true;
+        if (uri.equals("/profile")) return true;
         // 之後有需要限制 method 的情況，可以這樣寫：
         // if (uri.startsWith("/games/") && "GET".equalsIgnoreCase(method)) return true;
 

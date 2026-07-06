@@ -14,6 +14,9 @@ public class ProfileResponse {
     private String avatar;
     private LocalDate createdAt;        // 加入時間
 
+    // 追蹤關係
+    private UserFollowResponse follow;
+
     // 徽章
     private Boolean isDailyDone;        // 今日謎題是否已完成
 

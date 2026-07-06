@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 上述為 MyBatis 固定標頭資料，不需修改 -->
+
+<mapper namespace="com.ternura.mapper.UserFollowMapper">
+    <select id="selectFollowersByUserId" resultType="com.ternura.model.vo.UserVO">
+        SELECT u.id, u.username, u.avatar, u.email
+        FROM user_follow f
+        JOIN user u ON f.follower_id = u.id
+        WHERE f.following_id = #{userId}
+        ORDER BY f.created_at DESC
+    </select>
+
+    <select id="selectFollowingsByUserId" resultType="com.ternura.model.vo.UserVO">
+        SELECT u.id, u.username, u.avatar, u.email
+        FROM user_follow f
+        JOIN user u ON f.following_id = u.id
+        WHERE f.follower_id = #{userId}
+        ORDER BY f.created_at DESC
+    </select>
+</mapper>
