@@ -65,13 +65,13 @@ public class ProfileController {
         return Result.success();
     }
 
-    @GetMapping("/follow/follower/{username}")
+    @GetMapping("/follow/list/follower/{username}")
     public Result<List<UserVO>> getFollower(@PathVariable String username){
         List<UserVO> response = userFollowService.getFollower(username);
         return Result.success(response);
     }
 
-    @GetMapping("/follow/following/{username}")
+    @GetMapping("/follow/list/following/{username}")
     public Result<List<UserVO>> getFollowing(@PathVariable String username){
         List<UserVO> response = userFollowService.getFollowing(username);
         return Result.success(response);
