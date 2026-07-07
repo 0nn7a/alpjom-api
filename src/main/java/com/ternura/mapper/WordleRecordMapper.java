@@ -25,6 +25,9 @@ public interface WordleRecordMapper extends BaseMapper<WordleRecord> {
 
     List<WordleRecord> selectByCondition(Long userId, WordleMode mode, WordleDifficulty difficulty, WordleIsWin isWin, LocalDate date);
 
+    @Select("SELECT COUNT(1) FROM wordle_record WHERE is_win IS NOT NULL")
+    long countFinished();
+
 
     // Profile Data
     @Select("SELECT COUNT(1) > 0 FROM wordle_record WHERE user_id = #{userId} AND mode = 'DAILY' AND is_win IS NOT NULL AND date = #{today}")

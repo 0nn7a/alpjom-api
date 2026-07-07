@@ -11,13 +11,13 @@ import com.ternura.model.entity.User;
 import com.ternura.model.entity.UserFollow;
 import com.ternura.model.vo.UserVO;
 import com.ternura.utils.TimeUtils;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserFollowServiceImpl extends ServiceImpl<UserFollowMapper, UserFollow> implements UserFollowService {
     private final UserMapper userMapper;
     private final UserFollowMapper userFollowMapper;

@@ -10,13 +10,13 @@ import com.ternura.model.entity.WordleComment;
 import com.ternura.model.entity.WordleRecord;
 import com.ternura.model.vo.WordleCommentVO;
 import com.ternura.utils.TimeUtils;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class WordleCommentServiceImpl extends ServiceImpl<WordleCommentMapper, WordleComment> implements WordleCommentService {
     private final WordleCommentMapper wordleCommentMapper;
     private final WordleRecordMapper wordleRecordMapper;

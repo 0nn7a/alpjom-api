@@ -5,25 +5,34 @@
 <mapper namespace="com.ternura.mapper.WordleRecordMapper">
     <select id="selectByCondition" resultType="com.ternura.model.entity.WordleRecord">
         SELECT * FROM wordle_record
-        WHERE user_id = #{userId}
-        <if test="mode != null">
-            AND mode = #{mode}
-        </if>
-        <if test="difficulty != null">
-            AND difficulty = #{difficulty}
-        </if>
-        <if test="isWin != null and isWin == @com.ternura.model.enums.WordleIsWin@ONGOING">
-            AND is_win IS NULL
-        </if>
-        <if test="isWin != null and isWin == @com.ternura.model.enums.WordleIsWin@WIN">
-            AND is_win = true
-        </if>
-        <if test="isWin != null and isWin == @com.ternura.model.enums.WordleIsWin@LOSE">
-            AND is_win = false
-        </if>
-        <if test="date != null">
-            AND date = #{date}
-        </if>
+        <where>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="mode != null">
+                AND mode = #{mode}
+            </if>
+            <if test="difficulty != null">
+                AND difficulty = #{difficulty}
+            </if>
+            <choose>
+                <when test="isWin == @com.ternura.model.enums.WordleIsWin@ONGOING">
+                    AND is_win IS NULL
+                </when>
+                <when test="isWin == @com.ternura.model.enums.WordleIsWin@WIN">
+                    AND is_win = true
+                </when>
+                <when test="isWin == @com.ternura.model.enums.WordleIsWin@LOSE">
+                    AND is_win = false
+                </when>
+                <when test="isWin == @com.ternura.model.enums.WordleIsWin@FINISHED">
+                    AND is_win IS NOT NULL
+                </when>
+            </choose>
+            <if test="date != null">
+                AND date = #{date}
+            </if>
+        </where>
         ORDER BY created_at
     </select>
 

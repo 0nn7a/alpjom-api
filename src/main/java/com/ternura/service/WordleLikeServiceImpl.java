@@ -9,11 +9,11 @@ import com.ternura.mapper.WordleLikeMapper;
 import com.ternura.model.entity.WordleRecord;
 import com.ternura.model.vo.WordleLikeVO;
 import com.ternura.model.entity.WordleLike;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class WordleLikeServiceImpl extends ServiceImpl<WordleLikeMapper, WordleLike> implements WordleLikeService {
     private final WordleLikeMapper wordleLikeMapper;
     private final WordleRecordMapper wordleRecordMapper;
