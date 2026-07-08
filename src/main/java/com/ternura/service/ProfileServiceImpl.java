@@ -6,11 +6,10 @@ import com.ternura.exception.ErrorCode;
 import com.ternura.mapper.UserAvatarMapper;
 import com.ternura.mapper.UserMapper;
 import com.ternura.mapper.WordleRecordMapper;
-import com.ternura.model.dto.AvatarDeleteRequest;
-import com.ternura.model.dto.ProfileResponse;
-import com.ternura.model.dto.UserFollowResponse;
+import com.ternura.model.dto.*;
 import com.ternura.model.entity.User;
 import com.ternura.model.entity.UserAvatar;
+import com.ternura.model.entity.WordleRecord;
 import com.ternura.model.vo.HeatmapVO;
 import com.ternura.utils.TimeUtils;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +26,10 @@ public class ProfileServiceImpl implements ProfileService {
     private final UserAvatarMapper userAvatarMapper;
     private final CloudService cloudService;
     private final UserFollowService userFollowService;
+    private final GameService gameService;
 
     @Override
-    public ProfileResponse getProfile(Long userId, String username) {
+    public ProfileResponse getProfile(Long userId, String username, PageRequest pageRequest) {
         // 用戶基本資料
         User user = userMapper.selectByUsername(username);
         if (user == null) throw new BusinessException(ErrorCode.NOT_FOUND, "用戶不存在！");
@@ -46,6 +46,9 @@ public class ProfileServiceImpl implements ProfileService {
         // 打卡熱力圖
         List<HeatmapVO> heatmap = wordleRecordMapper.selectHeatmapByUser(user.getId());
 
+        // 最近遊戲紀錄
+        PageResponse<WordleRecord> recentGames = gameService.recordFinished(username, pageRequest);
+
         // 組裝資料回傳
         ProfileResponse response = new ProfileResponse();
         response.setId(user.getId());
@@ -57,6 +60,7 @@ public class ProfileServiceImpl implements ProfileService {
         response.setTotalDone(totalDone);
         response.setTotalAchievements(0); // 暫未開發，先回傳 0
         response.setHeatmap(heatmap);
+        response.setRecentGames(recentGames);
 
         return response;
     }

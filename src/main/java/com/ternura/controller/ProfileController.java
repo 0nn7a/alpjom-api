@@ -24,9 +24,10 @@ public class ProfileController {
     private final UserFollowService userFollowService;
 
     @GetMapping
-    public Result<ProfileResponse> getProfile(@RequestParam @NotBlank(message = "用戶名不得為空！") String username){
+    public Result<ProfileResponse> getProfile(@RequestParam @NotBlank(message = "用戶名不得為空！") String username,
+                                              PageRequest pageRequest){
         Long userId = CurrentHolder.getCurrentId();
-        ProfileResponse response = profileService.getProfile(userId, username);
+        ProfileResponse response = profileService.getProfile(userId, username, pageRequest);
         return Result.success(response);
     }
 
