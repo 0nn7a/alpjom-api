@@ -1,0 +1,54 @@
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      # DB_USERNAME 是 root，所以用 MYSQL_ROOT_PASSWORD 對應 DB_PASSWORD 即可，
+      # 不用另外建立 app 專用帳號
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      TZ: Asia/Taipei
+    volumes:
+      # mysql-init 裡的 .sql 檔只會在資料目錄「全新是空的」時自動執行一次
+      - mysql-data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    networks:
+      - alpjom-net
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${DB_PASSWORD}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      # 容器內要用服務名稱 "mysql" 當主機名稱，不能寫 localhost
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      R2_END_POINT: ${R2_END_POINT}
+      R2_ACCESS_KEY: ${R2_ACCESS_KEY}
+      R2_SECRET_KEY: ${R2_SECRET_KEY}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME}
+      R2_PUBLIC_URL: ${R2_PUBLIC_URL}
+    ports:
+      # 只綁 127.0.0.1，代表外部連不到 8080，之後交給 Nginx 反向代理對外
+      - "127.0.0.1:8080:8080"
+    networks:
+      - alpjom-net
+
+networks:
+  alpjom-net:
+    driver: bridge
+
+volumes:
+  mysql-data:

@@ -34,3 +34,4 @@ build/
 
 ### Privacy ###
 .env
+mysql-init/
