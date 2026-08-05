@@ -5,7 +5,7 @@ spring:
     time-zone: Asia/Taipei
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Taipei
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME}?serverTimezone=Asia/Taipei
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   servlet:
@@ -18,7 +18,7 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
     default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # 開發時印出 SQL，上線記得關掉
+    # log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  開發時印出 SQL
 
 
 jwt:
@@ -29,6 +29,9 @@ jwt:
 server:
   port: 8080
   address: 0.0.0.0
+  forward-headers-strategy: framework
+  # 讓 Spring 讀取 Nginx 附加的 X-Forwarded-* Header，
+  # 正確識別原始請求是 https、取得訪客真實 IP（而非 Nginx 內部位址）
 
 r2:
   endpoint: ${R2_END_POINT}
