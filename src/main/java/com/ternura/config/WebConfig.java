@@ -16,8 +16,11 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         // 攔截器的執行順序會依照註冊的先後順序
         registry.addInterceptor(tokenInterceptor)
-                .addPathPatterns("/**")        // 攔截所有路徑
-                .excludePathPatterns("/auth/**", "/profile/follow/list/**", "/game/**");
-                // 直接排除不需攔截的路徑
+                .addPathPatterns("/**")                 // 攔截所有路徑
+                .excludePathPatterns(                   // 直接排除不需攔截的路徑
+                        "/actuator/health",             // 放行健康檢查免登入，供監控與部署驗證
+                        "/auth/**",
+                        "/profile/follow/list/**",
+                        "/game/**");
     }
 }

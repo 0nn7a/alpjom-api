@@ -30,8 +30,20 @@ server:
   port: 8080
   address: 0.0.0.0
   forward-headers-strategy: framework
-  # 讓 Spring 讀取 Nginx 附加的 X-Forwarded-* Header，
+  # 讓 Spring 讀取 Nginx 附加的 X-Forwarded-* Header
   # 正確識別原始請求是 https、取得訪客真實 IP（而非 Nginx 內部位址）
+
+
+# Spring Boot Actuator：對外只保留健康檢查，其餘維運端點一律關閉
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health   # 白名單機制，未列出的端點（env、heapdump 等）不對外開放
+  endpoint:
+    health:
+      show-details: never # 只回 {"status":"UP"}，不揭露 DB 連線、磁碟空間等內部狀態
+
 
 r2:
   endpoint: ${R2_END_POINT}
