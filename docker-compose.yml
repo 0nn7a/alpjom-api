@@ -12,6 +12,9 @@ services:
       # mysql-init 裡的 .sql 檔只會在資料目錄「全新是空的」時自動執行一次
       - mysql-data:/var/lib/mysql
       - ./mysql-init:/docker-entrypoint-initdb.d
+    ports:
+      # 只綁 VM 自己的 127.0.0.1，外部連不到，之後用 SSH Tunnel 連線
+      - "127.0.0.1:3306:3306"
     networks:
       - alpjom-net
     healthcheck:
