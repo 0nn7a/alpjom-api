@@ -2,7 +2,7 @@
 
 > alpJom 益智小遊戲網站的 REST API 服務
 
-[前端展示頁](https://0nn7a.github.io/alpjom-web/) · [前端原始碼](https://github.com/0nn7a/alpjom-web)
+[前端展示頁](https://0nn7a.github.io/alpjom-web/) · [API 服務健檢](https://alpjom.duckdns.org/actuator/health) · [前端原始碼](https://github.com/0nn7a/alpjom-web)
 
 此服務為 alpJom 提供帳號驗證、遊戲流程、個人資料、戰績分享與社群互動等 API。
 
@@ -41,6 +41,43 @@ Spring Boot API
     └── Cloudflare R2：使用者頭像檔案
 ```
 
+## 部署
+
+線上服務：**https://alpjom.duckdns.org**
+
+| 項目 | 內容 |
+| --- | --- |
+| 主機 | Oracle Cloud Infrastructure，Ampere A1（ARM64）／ Ubuntu 24.04 |
+| 容器化 | Docker Compose 管理 Spring Boot 與 MySQL |
+| 對外 | Nginx 反向代理，Let's Encrypt 憑證（自動續約） |
+| 網域 | DuckDNS ＋ OCI 保留公用 IP |
+
+```
+網際網路
+    │ HTTPS :443
+    ▼
+Nginx（反向代理、TLS 終結）
+    │ HTTP :8080（僅 127.0.0.1）
+    ▼
+Spring Boot 容器
+    │ :3306（僅 Docker 內部網路）
+    ▼
+MySQL 容器
+```
+
+- **Multi-stage build**：最終映像檔不含 Maven 與原始碼
+- **最小暴露面**：後端綁 loopback、資料庫無對外連接埠，外部僅能經由 Nginx 存取 443
+- **兩層防火牆**：OCI 安全清單（雲端層）＋ iptables（作業系統層）
+- **啟動順序控制**：MySQL healthcheck 通過後才啟動後端
+- **維運端點**：Actuator 僅開放 `/actuator/health`，其餘於 Nginx 與應用層雙重阻擋
+
+健康檢查：
+
+```bash
+curl https://alpjom.duckdns.org/actuator/health
+# {"status":"UP"}
+```
+
 ## API 範圍
 
 | 類別 | 主要端點 |
@@ -76,7 +113,7 @@ src/main/
 
 ## 開發備註
 
-本專案目前作為個人作品部署使用，未提供資料庫 schema、Cloudflare R2 憑證與完整自架流程。
+本專案為個人作品，已完成雲端部署並持續運行中。原始碼公開，但不提供資料庫 schema 與 Cloudflare R2 憑證及自架流程。
 
 應用程式使用 MySQL 儲存帳號、遊戲紀錄與互動資料；使用 Cloudflare R2 儲存使用者頭像。敏感設定透過環境變數注入，不會提交至版本控制。
 
