@@ -48,8 +48,8 @@ Spring Boot API
 | 項目 | 內容 |
 | --- | --- |
 | 主機 | Oracle Cloud Infrastructure，Ampere A1（ARM64）／ Ubuntu 24.04 |
-| 容器化 | Docker Compose 管理 Spring Boot 與 MySQL |
-| 對外 | Nginx 反向代理，Let's Encrypt 憑證（自動續約） |
+| 容器化 | Docker Compose 管理 Nginx、Spring Boot、MySQL 三個服務 |
+| 對外 | Nginx 反向代理，Let's Encrypt 憑證（webroot 驗證，自動續約並重啟容器套用） |
 | 網域 | DuckDNS ＋ OCI 保留公用 IP |
 
 ```
@@ -57,7 +57,7 @@ Spring Boot API
     │ HTTPS :443
     ▼
 Nginx（反向代理、TLS 終結）
-    │ HTTP :8080（僅 127.0.0.1）
+    │ HTTP :8080（僅 Docker 內部網路）
     ▼
 Spring Boot 容器
     │ :3306（僅 Docker 內部網路）
@@ -66,10 +66,11 @@ MySQL 容器
 ```
 
 - **Multi-stage build**：最終映像檔不含 Maven 與原始碼
-- **最小暴露面**：後端綁 loopback、資料庫無對外連接埠，外部僅能經由 Nginx 存取 443
+- **最小暴露面**：後端與資料庫皆無對外連接埠，外部僅能經由 Nginx 存取 443
 - **兩層防火牆**：OCI 安全清單（雲端層）＋ iptables（作業系統層）
 - **啟動順序控制**：MySQL healthcheck 通過後才啟動後端
 - **維運端點**：Actuator 僅開放 `/actuator/health`，其餘於 Nginx 與應用層雙重阻擋
+- **憑證自動化**：certbot webroot 模式續約，deploy hook 自動重啟 Nginx 容器套用新憑證
 
 健康檢查：
 
