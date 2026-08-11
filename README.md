@@ -71,6 +71,7 @@ MySQL 容器
 - **啟動順序控制**：MySQL healthcheck 通過後才啟動後端
 - **維運端點**：Actuator 僅開放 `/actuator/health`，其餘於 Nginx 與應用層雙重阻擋
 - **憑證自動化**：certbot webroot 模式續約，deploy hook 自動重啟 Nginx 容器套用新憑證
+- **資料庫備份策略**：cron 排程每日自動備份、壓縮並輪替，保留最近 30 份版本
 
 健康檢查：
 
