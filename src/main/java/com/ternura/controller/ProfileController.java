@@ -7,10 +7,10 @@ import com.ternura.model.vo.UserVO;
 import com.ternura.service.ProfileService;
 import com.ternura.service.UserFollowService;
 import com.ternura.service.UserService;
-import com.ternura.utils.CurrentHolder;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
@@ -24,44 +24,48 @@ public class ProfileController {
     private final UserFollowService userFollowService;
 
     @GetMapping
-    public Result<ProfileResponse> getProfile(@RequestParam @NotBlank(message = "用戶名不得為空！") String username,
-                                              PageRequest pageRequest){
-        Long userId = CurrentHolder.getCurrentId();
+    public Result<ProfileResponse> getProfile(
+            @AuthenticationPrincipal Long userId,
+            @RequestParam @NotBlank(message = "用戶名不得為空！") String username,
+            PageRequest pageRequest){
         ProfileResponse response = profileService.getProfile(userId, username, pageRequest);
         return Result.success(response);
     }
 
     @PatchMapping("/user")
-    public Result<Void> updateUser(@RequestBody ProfileRequest request) {
-        Long userId = CurrentHolder.getCurrentId();
+    public Result<Void> updateUser(
+            @AuthenticationPrincipal Long userId,
+            @RequestBody ProfileRequest request) {
         userService.updateUser(userId, request);
         return Result.success();
     }
 
     @PatchMapping("/password")
-    public Result<Void> updatePassword(@RequestBody PasswordRequest request) {
-        Long userId = CurrentHolder.getCurrentId();
+    public Result<Void> updatePassword(
+            @AuthenticationPrincipal Long userId,
+            @RequestBody PasswordRequest request) {
         userService.updatePassword(userId, request);
         return Result.success();
     }
 
     @GetMapping("/avatar")
-    public Result<List<UserAvatar>> getAvatar() {
-        Long userId = CurrentHolder.getCurrentId();
+    public Result<List<UserAvatar>> getAvatar(@AuthenticationPrincipal Long userId) {
         List<UserAvatar> response = profileService.getAvatar(userId);
         return Result.success(response);
     }
 
     @PostMapping("/avatar")
-    public Result<UserAvatar> uploadAvatar(@RequestParam MultipartFile file){
-        Long userId = CurrentHolder.getCurrentId();
+    public Result<UserAvatar> uploadAvatar(
+            @AuthenticationPrincipal Long userId,
+            @RequestParam MultipartFile file){
         UserAvatar response = profileService.uploadAvatar(userId, file);
         return Result.success(response);
     }
 
     @DeleteMapping("/avatar")
-    public Result<Void> deleteAvatar(@RequestBody @Valid AvatarDeleteRequest request){
-        Long userId = CurrentHolder.getCurrentId();
+    public Result<Void> deleteAvatar(
+            @AuthenticationPrincipal Long userId,
+            @RequestBody @Valid AvatarDeleteRequest request){
         profileService.deleteAvatar(userId, request);
         return Result.success();
     }
@@ -79,8 +83,9 @@ public class ProfileController {
     }
 
     @PostMapping("/follow/{followingUsername}")
-    public Result<UserFollowResponse> follow(@PathVariable String followingUsername){
-        Long userId = CurrentHolder.getCurrentId();
+    public Result<UserFollowResponse> follow(
+            @AuthenticationPrincipal Long userId,
+            @PathVariable String followingUsername){
         UserFollowResponse response = userFollowService.toggleFollow(userId, followingUsername);
         return Result.success(response);
     }
