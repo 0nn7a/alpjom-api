@@ -25,7 +25,7 @@
 | 語言與框架 | Java 21、Spring Boot 4 |
 | 資料庫 | MySQL |
 | 資料存取 | MyBatis-Plus、PageHelper |
-| 身分驗證 | JWT Access Token + Refresh Token（支援持久化與撤銷） |
+| 身分驗證  | Spring Security Filter Chain + JWT Access Token / Refresh Token（支援持久化與撤銷） |
 | 物件儲存 | Cloudflare R2、AWS S3 SDK |
 | 建置工具 | Maven Wrapper |
 
@@ -106,7 +106,8 @@ src/main/
 │   ├── service/     # 商業邏輯
 │   ├── mapper/      # MyBatis 資料存取
 │   ├── model/       # Entity、DTO、VO、Enum
-│   ├── config/      # CORS、JWT、Jackson、R2 設定
+│   ├── config/      # Spring Security、CORS、Jackson、R2 設定
+│   ├── security/    # JWT 驗證 Filter、身分驗證失敗處理
 │   └── init/        # Wordle 單字庫初始化
 └── resources/
     ├── wordle/      # 答案與可猜測單字表
