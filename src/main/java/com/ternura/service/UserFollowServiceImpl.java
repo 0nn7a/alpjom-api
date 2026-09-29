@@ -7,9 +7,9 @@ import com.ternura.exception.ErrorCode;
 import com.ternura.mapper.UserFollowMapper;
 import com.ternura.mapper.UserMapper;
 import com.ternura.model.dto.UserFollowResponse;
+import com.ternura.model.dto.UserResponse;
 import com.ternura.model.entity.User;
 import com.ternura.model.entity.UserFollow;
-import com.ternura.model.vo.UserVO;
 import com.ternura.utils.TimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,7 +47,7 @@ public class UserFollowServiceImpl extends ServiceImpl<UserFollowMapper, UserFol
     }
 
     @Override
-    public List<UserVO> getFollower(String username) {
+    public List<UserResponse> getFollower(String username) {
         // 確認被查詢的使用者存在
         User user = userMapper.selectByUsername(username);
         if (user == null) {
@@ -59,7 +59,7 @@ public class UserFollowServiceImpl extends ServiceImpl<UserFollowMapper, UserFol
     }
 
     @Override
-    public List<UserVO> getFollowing(String username) {
+    public List<UserResponse> getFollowing(String username) {
         // 確認被查詢的使用者存在
         User user = userMapper.selectByUsername(username);
         if (user == null) {

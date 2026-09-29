@@ -7,7 +7,7 @@ import com.ternura.exception.ErrorCode;
 import com.ternura.mapper.WordleRecordMapper;
 import com.ternura.mapper.WordleLikeMapper;
 import com.ternura.model.entity.WordleRecord;
-import com.ternura.model.vo.WordleLikeVO;
+import com.ternura.model.dto.WordleLikeResponse;
 import com.ternura.model.entity.WordleLike;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ public class WordleLikeServiceImpl extends ServiceImpl<WordleLikeMapper, WordleL
     private final WordleRecordMapper wordleRecordMapper;
 
     @Override
-    public WordleLikeVO toggle(Long userId, String shareToken) {
+    public WordleLikeResponse toggle(Long userId, String shareToken) {
         // 確認該遊戲是否存在
         WordleRecord record = wordleRecordMapper.selectByShareToken(shareToken);
         if (record == null) {
@@ -42,7 +42,7 @@ public class WordleLikeServiceImpl extends ServiceImpl<WordleLikeMapper, WordleL
             save(wordleLike);
         }
 
-        WordleLikeVO like = new WordleLikeVO();
+        WordleLikeResponse like = new WordleLikeResponse();
         long likeCount = count(new LambdaQueryWrapper<WordleLike>().eq(WordleLike::getRecordId, record.getId()));
         boolean likedByMe = existed == null;
         like.setCount(likeCount);

@@ -8,6 +8,7 @@ import com.ternura.mapper.UserMapper;
 import com.ternura.mapper.WordleRecordMapper;
 import com.ternura.model.dto.PageRequest;
 import com.ternura.model.dto.PageResponse;
+import com.ternura.model.dto.WordleRecordResponse;
 import com.ternura.model.entity.User;
 import com.ternura.model.entity.WordleRecord;
 import com.ternura.model.enums.WordleIsWin;
@@ -29,7 +30,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public PageResponse<WordleRecord> recordFinished(String username, PageRequest request) {
+    public PageResponse<WordleRecordResponse> recordFinished(String username, PageRequest request) {
         // 用戶基本資料
         User user = userMapper.selectByUsername(username);
         if (user == null) throw new BusinessException(ErrorCode.NOT_FOUND, "用戶不存在！");
@@ -41,6 +42,18 @@ public class GameServiceImpl implements GameService {
         List<WordleRecord> list = wordleRecordMapper.selectByCondition(user.getId(), null, null, WordleIsWin.FINISHED, null);
 
         Page<WordleRecord> p = (Page<WordleRecord>) list;
-        return new PageResponse<>(p.getTotal(), p.getResult());
+        List<WordleRecordResponse> rows = p.getResult().stream().map(this::toResponse).toList();
+        return new PageResponse<>(p.getTotal(), rows);
+    }
+
+    private WordleRecordResponse toResponse(WordleRecord record) {
+        WordleRecordResponse response = new WordleRecordResponse();
+        response.setId(record.getId());
+        response.setMode(record.getMode());
+        response.setDifficulty(record.getDifficulty());
+        response.setIsWin(record.getIsWin());
+        response.setShareToken(record.getShareToken());
+        response.setFinishedAt(record.getFinishedAt());
+        return response;
     }
 }

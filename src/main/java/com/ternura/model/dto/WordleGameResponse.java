@@ -2,7 +2,6 @@ package com.ternura.model.dto;
 
 import com.ternura.model.enums.WordleDifficulty;
 import com.ternura.model.enums.WordleMode;
-import com.ternura.model.vo.WordleGuessVO;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -18,5 +17,5 @@ public class WordleGameResponse {
     private LocalDate date;
     private String answer; // 只有 isWin != null 才有值
     private String shareToken; // 只有 isWin != null 才有值
-    private List<WordleGuessVO> guesses; // 該局遊戲所有猜測紀錄，依 createdAt 排序
+    private List<WordleGuessItemResponse> guesses; // 該局遊戲所有猜測紀錄，依 createdAt 排序
 }

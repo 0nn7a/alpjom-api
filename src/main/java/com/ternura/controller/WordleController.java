@@ -4,8 +4,6 @@ import com.ternura.model.common.Result;
 import com.ternura.model.dto.*;
 import com.ternura.model.enums.WordleDifficulty;
 import com.ternura.model.enums.WordleMode;
-import com.ternura.model.vo.WordleLikeVO;
-import com.ternura.model.vo.WordleOngoingVO;
 import com.ternura.service.WordleCommentService;
 import com.ternura.service.WordleLikeService;
 import com.ternura.service.WordleService;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 @Validated
 @RestController
@@ -62,10 +59,10 @@ public class WordleController {
     }
 
     @PostMapping("/like/{shareToken}")
-    public Result<WordleLikeVO> like(
+    public Result<WordleLikeResponse> like(
             @AuthenticationPrincipal Long userId,
             @PathVariable String shareToken) {
-        WordleLikeVO response = wordleLikeService.toggle(userId, shareToken);
+        WordleLikeResponse response = wordleLikeService.toggle(userId, shareToken);
         return Result.success(response);
     }
 
@@ -86,18 +83,18 @@ public class WordleController {
     }
 
     @GetMapping("/before/daily")
-    public Result<Map<String, Object>> beforeDaily(
+    public Result<WordleBeforeDailyResponse> beforeDaily(
             @AuthenticationPrincipal Long userId,
             @RequestParam(required = false) LocalDate date) {
-        Map<String, Object> response = wordleService.beforeDaily(userId, date);
+        WordleBeforeDailyResponse response = wordleService.beforeDaily(userId, date);
         return Result.success(response);
     }
 
     @GetMapping("/before/practice")
-    public Result<List<WordleOngoingVO>> beforePractice(
+    public Result<List<WordleOngoingResponse>> beforePractice(
             @AuthenticationPrincipal Long userId,
             @RequestParam @NotNull(message = "請選擇難易度！") WordleDifficulty difficulty) {
-        List<WordleOngoingVO> games = wordleService.getOngoingGames(userId, WordleMode.PRACTICE, difficulty, null);
+        List<WordleOngoingResponse> games = wordleService.getOngoingGames(userId, WordleMode.PRACTICE, difficulty, null);
         return Result.success(games);
     }
 

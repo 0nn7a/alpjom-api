@@ -2,8 +2,8 @@ package com.ternura.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ternura.model.entity.WordleLike;
-import com.ternura.model.vo.WordleLikeVO;
+import com.ternura.model.dto.WordleLikeResponse;
 
 public interface WordleLikeService extends IService<WordleLike> {
-    WordleLikeVO toggle(Long userId, String shareToken);
+    WordleLikeResponse toggle(Long userId, String shareToken);
 }

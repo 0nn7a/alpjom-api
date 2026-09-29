@@ -36,7 +36,7 @@
         ORDER BY created_at
     </select>
 
-    <select id="selectHeatmapByUser" resultType="com.ternura.model.vo.HeatmapVO">
+    <select id="selectHeatmapByUser" resultType="com.ternura.model.dto.HeatmapResponse">
         SELECT DATE(date) date, COUNT(1) count
         FROM wordle_record
         WHERE user_id = #{userId} AND is_win IS NOT NULL

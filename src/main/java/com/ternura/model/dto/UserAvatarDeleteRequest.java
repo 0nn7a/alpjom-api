@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class AvatarDeleteRequest {
+public class UserAvatarDeleteRequest {
     @NotEmpty(message = "請選擇要刪除的頭貼！")
     private List<Long> ids;
 }

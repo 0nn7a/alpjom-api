@@ -2,8 +2,6 @@ package com.ternura.controller;
 
 import com.ternura.model.common.Result;
 import com.ternura.model.dto.*;
-import com.ternura.model.entity.UserAvatar;
-import com.ternura.model.vo.UserVO;
 import com.ternura.service.ProfileService;
 import com.ternura.service.UserFollowService;
 import com.ternura.service.UserService;
@@ -49,36 +47,36 @@ public class ProfileController {
     }
 
     @GetMapping("/avatar")
-    public Result<List<UserAvatar>> getAvatar(@AuthenticationPrincipal Long userId) {
-        List<UserAvatar> response = profileService.getAvatar(userId);
+    public Result<List<UserAvatarResponse>> getAvatar(@AuthenticationPrincipal Long userId) {
+        List<UserAvatarResponse> response = profileService.getAvatar(userId);
         return Result.success(response);
     }
 
     @PostMapping("/avatar")
-    public Result<UserAvatar> uploadAvatar(
+    public Result<UserAvatarResponse> uploadAvatar(
             @AuthenticationPrincipal Long userId,
             @RequestParam MultipartFile file){
-        UserAvatar response = profileService.uploadAvatar(userId, file);
+        UserAvatarResponse response = profileService.uploadAvatar(userId, file);
         return Result.success(response);
     }
 
     @DeleteMapping("/avatar")
     public Result<Void> deleteAvatar(
             @AuthenticationPrincipal Long userId,
-            @RequestBody @Valid AvatarDeleteRequest request){
+            @RequestBody @Valid UserAvatarDeleteRequest request){
         profileService.deleteAvatar(userId, request);
         return Result.success();
     }
 
     @GetMapping("/follow/list/follower/{username}")
-    public Result<List<UserVO>> getFollower(@PathVariable String username){
-        List<UserVO> response = userFollowService.getFollower(username);
+    public Result<List<UserResponse>> getFollower(@PathVariable String username){
+        List<UserResponse> response = userFollowService.getFollower(username);
         return Result.success(response);
     }
 
     @GetMapping("/follow/list/following/{username}")
-    public Result<List<UserVO>> getFollowing(@PathVariable String username){
-        List<UserVO> response = userFollowService.getFollowing(username);
+    public Result<List<UserResponse>> getFollowing(@PathVariable String username){
+        List<UserResponse> response = userFollowService.getFollowing(username);
         return Result.success(response);
     }
 

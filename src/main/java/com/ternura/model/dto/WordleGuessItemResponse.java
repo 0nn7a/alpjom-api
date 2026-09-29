@@ -1,9 +1,9 @@
-package com.ternura.model.vo;
+package com.ternura.model.dto;
 
 import lombok.Data;
 
 @Data
-public class WordleGuessVO {
+public class WordleGuessItemResponse {
     private String guessWord;
     private String result;
 }

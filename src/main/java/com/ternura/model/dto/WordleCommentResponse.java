@@ -1,11 +1,11 @@
-package com.ternura.model.vo;
+package com.ternura.model.dto;
 
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
-public class WordleCommentVO {
+public class WordleCommentResponse {
     private Long id;
     private String username;
     private String avatar;

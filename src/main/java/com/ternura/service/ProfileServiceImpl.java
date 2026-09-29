@@ -9,8 +9,6 @@ import com.ternura.mapper.WordleRecordMapper;
 import com.ternura.model.dto.*;
 import com.ternura.model.entity.User;
 import com.ternura.model.entity.UserAvatar;
-import com.ternura.model.entity.WordleRecord;
-import com.ternura.model.vo.HeatmapVO;
 import com.ternura.utils.TimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,10 +42,10 @@ public class ProfileServiceImpl implements ProfileService {
         int totalDone = wordleRecordMapper.countTotalDoneByUser(user.getId());
 
         // 打卡熱力圖
-        List<HeatmapVO> heatmap = wordleRecordMapper.selectHeatmapByUser(user.getId());
+        List<HeatmapResponse> heatmap = wordleRecordMapper.selectHeatmapByUser(user.getId());
 
         // 最近遊戲紀錄
-        PageResponse<WordleRecord> recentGames = gameService.recordFinished(username, pageRequest);
+        PageResponse<WordleRecordResponse> recentGames = gameService.recordFinished(username, pageRequest);
 
         // 組裝資料回傳
         ProfileResponse response = new ProfileResponse();
@@ -66,12 +64,13 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public List<UserAvatar> getAvatar(Long userId) {
-        return userAvatarMapper.selectList(new QueryWrapper<UserAvatar>().eq("user_id", userId));
+    public List<UserAvatarResponse> getAvatar(Long userId) {
+        return userAvatarMapper.selectList(new QueryWrapper<UserAvatar>().eq("user_id", userId))
+                .stream().map(this::toResponse).toList();
     }
 
     @Override
-    public UserAvatar uploadAvatar(Long userId, MultipartFile file) {
+    public UserAvatarResponse uploadAvatar(Long userId, MultipartFile file) {
         // 1. 上傳圖片到 R2
         String fileUrl = cloudService.upload(file);
 
@@ -81,12 +80,12 @@ public class ProfileServiceImpl implements ProfileService {
         userAvatar.setFileUrl(fileUrl);
         userAvatarMapper.insert(userAvatar);
 
-        return userAvatar;
+        return toResponse(userAvatar);
     }
 
     @Override
     @Transactional
-    public void deleteAvatar(Long userId, AvatarDeleteRequest request) {
+    public void deleteAvatar(Long userId, UserAvatarDeleteRequest request) {
         List<Long> ids = request.getIds();
 
         // 1. 查出對應記錄
@@ -105,5 +104,14 @@ public class ProfileServiceImpl implements ProfileService {
         if (isCurrentAvatarDeleted) {
             userMapper.resetAvatarToDefault(userId);
         }
+    }
+
+
+
+    private UserAvatarResponse toResponse(UserAvatar avatar) {
+        UserAvatarResponse response = new UserAvatarResponse();
+        response.setId(avatar.getId());
+        response.setFileUrl(avatar.getFileUrl());
+        return response;
     }
 }

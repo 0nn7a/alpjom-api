@@ -9,7 +9,6 @@ import com.ternura.model.dto.*;
 import com.ternura.model.entity.RefreshToken;
 import com.ternura.model.entity.User;
 import com.ternura.model.entity.UserAvatar;
-import com.ternura.model.vo.UserVO;
 import com.ternura.utils.JwtUtils;
 import com.ternura.utils.PasswordUtil;
 import com.ternura.utils.TimeUtils;
@@ -101,9 +100,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         refreshTokenService.save(entity);
 
         // 回傳 User 非敏感資料 + 兩個 Token 資料
-        UserVO userVO = new UserVO(user.getId(), user.getUsername(), user.getEmail(), user.getAvatar());
+        UserResponse userResponse = new UserResponse(user.getId(), user.getUsername(), user.getEmail(), user.getAvatar());
         LoginResponse response = new LoginResponse();
-        response.setUser(userVO);
+        response.setUser(userResponse);
         response.setToken(token);
         response.setRefreshToken(refreshToken);
         response.setExpiredAt(jwtUtils.parseTokenTime(token));

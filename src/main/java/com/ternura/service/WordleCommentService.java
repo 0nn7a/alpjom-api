@@ -1,7 +1,7 @@
 package com.ternura.service;
 
 import com.ternura.model.dto.WordleCommentRequest;
-import com.ternura.model.vo.WordleCommentVO;
+import com.ternura.model.dto.WordleCommentResponse;
 
 import java.util.List;
 
@@ -10,5 +10,5 @@ public interface WordleCommentService {
 
     void delete(Long userId, Long id);
 
-    List<WordleCommentVO> selectByRecordId(Long recordId);
+    List<WordleCommentResponse> selectByRecordId(Long recordId);
 }

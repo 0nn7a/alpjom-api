@@ -3,7 +3,7 @@
 <!-- 上述為 MyBatis 固定標頭資料，不需修改 -->
 
 <mapper namespace="com.ternura.mapper.UserFollowMapper">
-    <select id="selectFollowersByUserId" resultType="com.ternura.model.vo.UserVO">
+    <select id="selectFollowersByUserId" resultType="com.ternura.model.dto.UserResponse">
         SELECT u.id, u.username, u.avatar, u.email
         FROM user_follow f
         JOIN user u ON f.follower_id = u.id
@@ -11,7 +11,7 @@
         ORDER BY f.created_at DESC
     </select>
 
-    <select id="selectFollowingsByUserId" resultType="com.ternura.model.vo.UserVO">
+    <select id="selectFollowingsByUserId" resultType="com.ternura.model.dto.UserResponse">
         SELECT u.id, u.username, u.avatar, u.email
         FROM user_follow f
         JOIN user u ON f.following_id = u.id

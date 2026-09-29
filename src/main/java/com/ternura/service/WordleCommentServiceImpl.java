@@ -8,7 +8,7 @@ import com.ternura.mapper.WordleRecordMapper;
 import com.ternura.model.dto.WordleCommentRequest;
 import com.ternura.model.entity.WordleComment;
 import com.ternura.model.entity.WordleRecord;
-import com.ternura.model.vo.WordleCommentVO;
+import com.ternura.model.dto.WordleCommentResponse;
 import com.ternura.utils.TimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -61,7 +61,7 @@ public class WordleCommentServiceImpl extends ServiceImpl<WordleCommentMapper, W
     }
 
     @Override
-    public List<WordleCommentVO> selectByRecordId(Long recordId) {
+    public List<WordleCommentResponse> selectByRecordId(Long recordId) {
         return wordleCommentMapper.selectByRecordId(recordId);
     }
 }

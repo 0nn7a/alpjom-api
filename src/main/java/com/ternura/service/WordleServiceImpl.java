@@ -9,10 +9,6 @@ import com.ternura.model.entity.*;
 import com.ternura.model.enums.WordleDifficulty;
 import com.ternura.model.enums.WordleIsWin;
 import com.ternura.model.enums.WordleMode;
-import com.ternura.model.vo.WordleCommentVO;
-import com.ternura.model.vo.WordleGuessVO;
-import com.ternura.model.vo.WordleLikeVO;
-import com.ternura.model.vo.WordleOngoingVO;
 import com.ternura.utils.TimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -149,7 +145,7 @@ public class WordleServiceImpl implements WordleService {
         }
 
         // 回傳結果
-        WordleGuessVO guess = new WordleGuessVO();
+        WordleGuessItemResponse guess = new WordleGuessItemResponse();
         guess.setGuessWord(request.getGuessWord());
         guess.setResult(result);
 
@@ -217,7 +213,7 @@ public class WordleServiceImpl implements WordleService {
             response.setShareToken(record.getShareToken());
         }
 
-        List<WordleGuessVO> guesses = wordleGuessMapper.selectGuessesByRecordId(record.getId());
+        List<WordleGuessItemResponse> guesses = wordleGuessMapper.selectGuessesByRecordId(record.getId());
         response.setGuesses(guesses);
 
         return response;
@@ -235,7 +231,7 @@ public class WordleServiceImpl implements WordleService {
         User user = userMapper.selectById(record.getUserId());
 
         // 查詢猜測過程
-        List<WordleGuessVO> guesses = wordleGuessMapper.selectGuessesByRecordId(record.getId());
+        List<WordleGuessItemResponse> guesses = wordleGuessMapper.selectGuessesByRecordId(record.getId());
 
         // 組裝、補齊回應內容
         WordleShareResponse response = new WordleShareResponse();
@@ -256,20 +252,20 @@ public class WordleServiceImpl implements WordleService {
                     .eq(WordleLike::getRecordId, record.getId())
                     .eq(WordleLike::getUserId, userId)) != null;
         }
-        WordleLikeVO wordleLike = new WordleLikeVO();
+        WordleLikeResponse wordleLike = new WordleLikeResponse();
         wordleLike.setCount(likeCount);
         wordleLike.setByMe(likedByMe);
         response.setLike(wordleLike);
 
         // 查找、補齊留言區
-        List<WordleCommentVO> comments = wordleCommentService.selectByRecordId(record.getId());
+        List<WordleCommentResponse> comments = wordleCommentService.selectByRecordId(record.getId());
         response.setComments(comments);
 
         return response;
     }
 
     @Override
-    public Map<String, Object> beforeDaily(Long userId, LocalDate date) {
+    public WordleBeforeDailyResponse beforeDaily(Long userId, LocalDate date) {
         // 取得該用戶當日是否開始過謎題
         if (date == null) {
             date = TimeUtils.today();
@@ -277,29 +273,24 @@ public class WordleServiceImpl implements WordleService {
         WordleRecord existed = wordleRecordMapper.selectRecordByUserModeDate(userId, WordleMode.DAILY, date);
 
         // 回傳 recordId、isWin 供前端判斷能否接續遊戲
-        Map<String, Object> result = new HashMap<>();
-
+        WordleBeforeDailyResponse result = new WordleBeforeDailyResponse();
         if (existed != null) {
-            result.put("recordId", existed.getId());
-            result.put("isWin", existed.getIsWin());
-            result.put("shareToken", existed.getShareToken());
-        } else {
-            result.put("recordId", null);
-            result.put("isWin", null);
-            result.put("shareToken", null);
+            result.setRecordId(existed.getId());
+            result.setIsWin(existed.getIsWin());
+            result.setShareToken(existed.getShareToken());
         }
 
         return result;
     }
 
     @Override
-    public List<WordleOngoingVO> getOngoingGames(Long userId, WordleMode mode, WordleDifficulty difficulty, LocalDate date) {
+    public List<WordleOngoingResponse> getOngoingGames(Long userId, WordleMode mode, WordleDifficulty difficulty, LocalDate date) {
         // 取得符合條件的未完成對局
         List<WordleRecord> records = wordleRecordMapper.selectByCondition(userId, mode, difficulty, WordleIsWin.ONGOING, date);
 
         // 封裝上每場對局的已猜測次數並回傳
         return records.stream().map(record -> {
-            WordleOngoingVO ongoing = new WordleOngoingVO();
+            WordleOngoingResponse ongoing = new WordleOngoingResponse();
             ongoing.setRecordId(record.getId());
             ongoing.setMode(record.getMode());
             ongoing.setDifficulty(record.getDifficulty());

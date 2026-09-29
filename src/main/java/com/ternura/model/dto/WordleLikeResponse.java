@@ -1,9 +1,9 @@
-package com.ternura.model.vo;
+package com.ternura.model.dto;
 
 import lombok.Data;
 
 @Data
-public class WordleLikeVO {
+public class WordleLikeResponse {
     private long count;
     private boolean byMe; // 當前登入者是否已按讚
 }

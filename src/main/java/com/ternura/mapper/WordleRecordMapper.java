@@ -1,11 +1,11 @@
 package com.ternura.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ternura.model.dto.HeatmapResponse;
 import com.ternura.model.entity.WordleRecord;
 import com.ternura.model.enums.WordleDifficulty;
 import com.ternura.model.enums.WordleIsWin;
 import com.ternura.model.enums.WordleMode;
-import com.ternura.model.vo.HeatmapVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -36,5 +36,5 @@ public interface WordleRecordMapper extends BaseMapper<WordleRecord> {
     @Select("SELECT COUNT(1) FROM wordle_record WHERE user_id = #{userId} AND is_win IS NOT NULL")
     int countTotalDoneByUser(Long userId);
 
-    List<HeatmapVO> selectHeatmapByUser(Long userId);
+    List<HeatmapResponse> selectHeatmapByUser(Long userId);
 }

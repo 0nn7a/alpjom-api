@@ -3,7 +3,7 @@
 <!-- 上述為 MyBatis 固定標頭資料，不需修改 -->
 
 <mapper namespace="com.ternura.mapper.WordleCommentMapper">
-    <select id="selectByRecordId" resultType="com.ternura.model.vo.WordleCommentVO">
+    <select id="selectByRecordId" resultType="com.ternura.model.dto.WordleCommentResponse">
         SELECT c.id, u.username, u.avatar, c.content, c.created_at
         FROM wordle_comment c
         JOIN user u ON c.user_id = u.id

@@ -1,7 +1,5 @@
 package com.ternura.model.dto;
 
-import com.ternura.model.entity.WordleRecord;
-import com.ternura.model.vo.HeatmapVO;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -26,8 +24,8 @@ public class ProfileResponse {
     private Integer totalAchievements;  // 擁有成就數量（暫未開發，先回傳 0）
 
     // 打卡熱力圖
-    private List<HeatmapVO> heatmap;    // { date, count }[]
+    private List<HeatmapResponse> heatmap;    // { date, count }[]
 
     // 最近遊戲紀錄
-    private PageResponse<WordleRecord> recentGames;
+    private PageResponse<WordleRecordResponse> recentGames;
 }
