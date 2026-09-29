@@ -36,6 +36,7 @@ build/
 ### Privacy ###
 .env
 mysql-init/
+backups/
 
 ### Other ###
 .DS_Store
