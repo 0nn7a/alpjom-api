@@ -105,7 +105,7 @@ src/main/
 │   ├── controller/  # REST API 端點
 │   ├── service/     # 商業邏輯
 │   ├── mapper/      # MyBatis 資料存取
-│   ├── model/       # Entity、DTO、VO、Enum
+│   ├── model/       # Entity、DTO、Enum、Result 等
 │   ├── config/      # Spring Security、CORS、Jackson、R2 設定
 │   ├── security/    # JWT 驗證 Filter、身分驗證失敗處理
 │   └── init/        # Wordle 單字庫初始化
