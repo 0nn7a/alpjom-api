@@ -12,6 +12,7 @@ import com.ternura.model.entity.User;
 import com.ternura.model.entity.UserFollow;
 import com.ternura.utils.TimeUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -66,7 +67,7 @@ public class UserFollowServiceImpl extends ServiceImpl<UserFollowMapper, UserFol
             throw new BusinessException(ErrorCode.NOT_FOUND, "查無此用戶！");
         }
 
-        // 查找該使用者的所有粉絲
+        // 查找該使用者追蹤中的所有用戶
         return userFollowMapper.selectFollowingsByUserId(user.getId());
     }
 
@@ -90,13 +91,19 @@ public class UserFollowServiceImpl extends ServiceImpl<UserFollowMapper, UserFol
                 .eq(UserFollow::getFollowingId, followingId));
 
         if (existed != null) {
+            // 已追蹤 -> 取消 -> 刪除該資料
             removeById(existed.getId());
         } else {
+            // 未追蹤 -> 新增資料
             UserFollow follow = new UserFollow();
             follow.setFollowerId(followerId);
             follow.setFollowingId(followingId);
             follow.setCreatedAt(TimeUtils.now());
-            save(follow);
+            try {
+                save(follow);
+            } catch (DuplicateKeyException e) {
+                // 併發時另一個請求已先新增成功，結果等同已追蹤，不視為錯誤
+            }
         }
 
         // 計算當前查看使用者的粉絲及追蹤中總數，及登入用戶對其的追蹤狀態

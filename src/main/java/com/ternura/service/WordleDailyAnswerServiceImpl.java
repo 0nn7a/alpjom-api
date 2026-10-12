@@ -7,6 +7,7 @@ import com.ternura.model.entity.WordleDailyAnswer;
 import com.ternura.model.entity.WordleWord;
 import com.ternura.utils.TimeUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 
@@ -35,7 +36,12 @@ public class WordleDailyAnswerServiceImpl
             answer = new WordleDailyAnswer();
             answer.setWordId(word.getId());
             answer.setDate(date);
-            save(answer);
+            try {
+                save(answer);
+            } catch (DuplicateKeyException e) {
+                // 其他執行個體已先建立當日謎題（唯一索引擋下），改用已存在的那筆
+                answer = wordleDailyAnswerMapper.selectAnswerByDate(date);
+            }
         }
 
         return answer;

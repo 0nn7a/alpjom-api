@@ -10,6 +10,7 @@ import com.ternura.model.entity.WordleRecord;
 import com.ternura.model.dto.WordleLikeResponse;
 import com.ternura.model.entity.WordleLike;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -39,7 +40,11 @@ public class WordleLikeServiceImpl extends ServiceImpl<WordleLikeMapper, WordleL
             WordleLike wordleLike = new WordleLike();
             wordleLike.setRecordId(record.getId());
             wordleLike.setUserId(userId);
-            save(wordleLike);
+            try {
+                save(wordleLike);
+            } catch (DuplicateKeyException e) {
+                // 併發時另一個請求已先新增成功，結果等同已按讚，不視為錯誤
+            }
         }
 
         WordleLikeResponse like = new WordleLikeResponse();
