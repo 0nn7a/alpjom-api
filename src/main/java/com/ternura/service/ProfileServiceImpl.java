@@ -11,11 +11,13 @@ import com.ternura.model.entity.User;
 import com.ternura.model.entity.UserAvatar;
 import com.ternura.utils.TimeUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService {
@@ -78,7 +80,21 @@ public class ProfileServiceImpl implements ProfileService {
         UserAvatar userAvatar = new UserAvatar();
         userAvatar.setUserId(userId);
         userAvatar.setFileUrl(fileUrl);
-        userAvatarMapper.insert(userAvatar);
+
+        try {
+            userAvatarMapper.insert(userAvatar);
+        } catch (RuntimeException e) {
+            // DB 寫入失敗時，R2 上的檔案已無紀錄對應，需補償刪除避免留下孤兒檔
+            try {
+                cloudService.deleteBatch(List.of(fileUrl));
+            } catch (RuntimeException deleteError) {
+                // 補償機制也失敗：刪除失敗的細節已由 deleteBatch 記錄，這裡只需記下殘留的檔案供事後清理
+                log.error("頭貼補償刪除失敗，殘留檔案: {}", fileUrl);
+                e.addSuppressed(deleteError); // 把一個次要的例外附在主要例外上
+            }
+
+            throw e; // 拋出整個例外，交給 GlobalExceptionHandler 統一處理
+        }
 
         return toResponse(userAvatar);
     }
