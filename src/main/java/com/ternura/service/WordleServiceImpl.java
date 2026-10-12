@@ -12,6 +12,8 @@ import com.ternura.model.enums.WordleMode;
 import com.ternura.utils.TimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
 import java.util.*;
 
@@ -88,6 +90,7 @@ public class WordleServiceImpl implements WordleService {
     }
 
     @Override
+    @Transactional
     public WordleGuessResponse guess(Long userId, WordleGuessRequest request) {
         // 驗證遊戲是否存在且屬於該用戶
         WordleRecord record = wordleRecordMapper.selectByIdUser(userId, request.getRecordId());
